@@ -538,6 +538,70 @@ const EXERCISE_LIBRARY = [
 ];
 
 // ─────────────────────────────────────────────
+// CUSTOM WORKOUT TEMPLATES (mirror the 9 workouts)
+// selections: { [groupIndex]: [exerciseId, ...] }
+// ─────────────────────────────────────────────
+const TEMPLATES = [
+  {
+    id:"t1", name:"Custom Rings", icon:"⭕", color:"#5a8a5a",
+    desc:"Ring push/pull + stabilizer — bodyweight focused",
+    selections:{ 0:["wu-9","wu-2","wu-17"], 1:["ch-6","ch-10","ch-8"], 2:["bk-1","bk-2","bk-11","bk-17"], 3:["sh-11","sh-12"] }
+  },
+  {
+    id:"t2", name:"Custom Skills & Legs", icon:"🎯", color:"#5a7aaa",
+    desc:"Leg strength, balance, and core skill work",
+    selections:{ 0:["wu-4","wu-3","wu-8","wu-11"], 6:["qu-3","qu-7","qu-9","qu-11"], 7:["hm-6","hm-1"], 8:["gl-4","gl-9"], 9:["co-lib-1","co-lib-3"] }
+  },
+  {
+    id:"t3", name:"Custom Chest & Back", icon:"🏋️", color:"#aa5a5a",
+    desc:"Horizontal push/pull supersets",
+    selections:{ 0:["wu-1","wu-2","wu-9"], 1:["ch-1","ch-4","ch-11","ch-13"], 2:["bk-1","bk-6","bk-7","bk-13"] }
+  },
+  {
+    id:"t4", name:"Custom Legs", icon:"🦵", color:"#7a5aaa",
+    desc:"Quad, hamstring, glute, and calf work",
+    selections:{ 0:["wu-4","wu-3","wu-11","wu-8"], 6:["qu-1","qu-2","qu-3","qu-7"], 7:["hm-1","hm-4","hm-6"], 8:["gl-1","gl-5"], 10:["ca-1","ca-2"] }
+  },
+  {
+    id:"t5", name:"Custom Skills / Handstands", icon:"🤸", color:"#5aaa8a",
+    desc:"Skill work, mobility, and bodyweight",
+    selections:{ 0:["wu-5","wu-6","wu-14","wu-16"], 3:["sh-11","sh-12"], 9:["co-lib-4","co-lib-8","co-lib-6"] }
+  },
+  {
+    id:"t6", name:"Custom Shoulders / Arms", icon:"💪", color:"#aa8a5a",
+    desc:"Shoulder press, bicep curls, tricep extensions",
+    selections:{ 0:["wu-2","wu-17","wu-14"], 3:["sh-1","sh-2","sh-4","sh-7","sh-9"], 4:["bi-1","bi-2","bi-3"], 5:["tr-1","tr-3","tr-4"] }
+  },
+  {
+    id:"t7", name:"Custom Core", icon:"🎯", color:"#5a5aaa",
+    desc:"Core stability, rotation, and flexion",
+    selections:{ 0:["wu-5","wu-7","wu-16"], 9:["co-lib-1","co-lib-2","co-lib-3","co-lib-5","co-lib-6","co-lib-9","co-lib-15"] }
+  },
+  {
+    id:"t8", name:"Custom Paddle", icon:"🛶", color:"#5a8aaa",
+    desc:"Lat, rotational, and shoulder stability for paddle sports",
+    selections:{ 0:["wu-2","wu-9","wu-17"], 2:["bk-12","bk-8","bk-7","bk-13"], 3:["sh-9","sh-7"], 9:["co-lib-9","co-lib-16","co-lib-15"] }
+  },
+  {
+    id:"t9", name:"Custom Pilates", icon:"🧘", color:"#aa5a8a",
+    desc:"Glutes, legs, core, and strap movements",
+    selections:{ 0:["wu-4","wu-11","wu-5"], 6:["qu-3","qu-7","qu-13"], 8:["gl-1","gl-4","gl-9","gl-5"], 9:["co-lib-1","co-lib-2","co-lib-13"] }
+  },
+];
+
+// ─────────────────────────────────────────────
+// CARDIO ACTIVITIES
+// ─────────────────────────────────────────────
+const CARDIO_ACTIVITIES = [
+  { id:"crd-hike", name:"Hiking",          icon:"🥾" },
+  { id:"crd-mtb",  name:"Mountain Biking", icon:"🚵" },
+  { id:"crd-road", name:"Road Biking",     icon:"🚴" },
+  { id:"crd-kay",  name:"Kayaking",        icon:"🛶" },
+  { id:"crd-sup",  name:"SUP",             icon:"🏄" },
+  { id:"crd-erg",  name:"ERG",             icon:"🚣" },
+];
+
+// ─────────────────────────────────────────────
 // ROUND BUILDER
 // ─────────────────────────────────────────────
 function buildRounds(workout, sessionIndex) {
@@ -565,15 +629,31 @@ function getRecommendation(exId, exHistory, phase) {
   const last = exHistory[exHistory.length - 1];
   const lastSets = last.sets.filter(s => s.reps);
   if (!lastSets.length) return null;
+  const intent = last.nextIntent; // "+", "=", "-", or null
   const lastReps = lastSets.map(s => parseInt(s.reps) || 0);
   const lastWeights = lastSets.map(s => s.weight || "BW");
   const avgReps = Math.round(lastReps.reduce((a, b) => a + b, 0) / lastReps.length);
+  const heaviestW = Math.max(...lastSets.map(s => parseFloat(s.weight) || 0));
   const lastWeight = lastWeights[lastWeights.length - 1];
   const isBodyweight = !lastWeight || lastWeight === "BW" || lastWeight === "" || isNaN(parseFloat(lastWeight));
   const targetHigh = PHASE[phase].repsHigh;
   const targetLow = PHASE[phase].repsLow;
   let rec = "", badge = "same";
-  if (isBodyweight) {
+
+  // Intent from last session takes priority for weighted exercises
+  if (intent === "+" && !isBodyweight && heaviestW > 0) {
+    const nextW = Math.ceil(heaviestW * 1.05 / 5) * 5;
+    rec = `You flagged ↑ — try ${nextW} lbs (~5% up from ${heaviestW})`;
+    badge = "up";
+  } else if (intent === "-" && !isBodyweight) {
+    const w = parseFloat(lastWeight);
+    const dropW = Math.floor(w * 0.95 / 5) * 5;
+    rec = `You flagged ↓ — try ${dropW} lbs (drop ~5%)`;
+    badge = "down";
+  } else if (intent === "=") {
+    rec = `You flagged = — same weight as last time, push for reps`;
+    badge = "same";
+  } else if (isBodyweight) {
     if (avgReps >= targetHigh) { rec = `Hit ${avgReps} reps — add light load or progress variation`; badge = "up"; }
     else if (avgReps < targetLow - 2) { rec = `${avgReps} reps last time — focus on form, same variation`; }
     else { rec = `${avgReps} reps last time — push for ${Math.min(avgReps + 1, targetHigh)}`; }
@@ -583,7 +663,7 @@ function getRecommendation(exId, exHistory, phase) {
     else if (avgReps < targetLow - 1) { const dropW = Math.floor(w * 0.95 / 2.5) * 2.5; rec = `${avgReps} reps @ ${w} — consider ${dropW} lbs`; badge = "down"; }
     else { rec = `${avgReps} reps @ ${w} lbs — stay here, push for ${Math.min(avgReps + 1, targetHigh)} reps`; }
   }
-  return { rec, badge, lastDate: new Date(last.date).toLocaleDateString("en-US", { month:"short", day:"numeric" }), lastSets, lastWeights };
+  return { rec, badge, lastDate: new Date(last.date).toLocaleDateString("en-US", { month:"short", day:"numeric" }), lastSets, lastWeights, intent };
 }
 
 // ─────────────────────────────────────────────
@@ -670,8 +750,10 @@ function UpNextCard({ workout, onStart }) {
   );
 }
 
-function ExerciseRow({ ex, sets, recommendation, onAddSet, onUpdateSet }) {
+function ExerciseRow({ ex, sets, recommendation, onAddSet, onUpdateSet, intent, onSetIntent }) {
   const badgeColor = { up:"#5aaa5a", down:"#aa6a5a", same:"#5a6aaa" };
+  const hasLogged = sets.some(s => s.reps);
+  const heaviestLogged = Math.max(...sets.map(s => parseFloat(s.weight) || 0));
   return (
     <div style={{ marginBottom:14 }}>
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:4 }}>
@@ -710,11 +792,37 @@ function ExerciseRow({ ex, sets, recommendation, onAddSet, onUpdateSet }) {
         <button onClick={onAddSet}
           style={{ background:"#181818", border:"1px solid #2a2a2a", color:"#444", borderRadius:4, padding:"3px 8px", cursor:"pointer", fontSize:11 }}>+set</button>
       </div>
+      {/* Intent buttons — shown after logging any set */}
+      {hasLogged && onSetIntent && (
+        <div style={{ display:"flex", gap:6, marginTop:8, alignItems:"center" }}>
+          <span style={{ color:"#333", fontSize:10 }}>Next:</span>
+          {["-","=","+"].map(v => {
+            const active = intent === v;
+            const col = v==="+" ? "#5aaa5a" : v==="-" ? "#aa5a5a" : "#5a5aaa";
+            const bgA = v==="+" ? "#0d1f0d" : v==="-" ? "#1f0d0d" : "#0d0d1f";
+            return (
+              <button key={v} onClick={() => onSetIntent(ex.id, v)}
+                style={{ background: active ? bgA : "#181818",
+                  border:`1px solid ${active ? col : "#2a2a2a"}`,
+                  color: active ? col : "#444",
+                  borderRadius:4, padding:"3px 10px", cursor:"pointer", fontSize:14, fontWeight:700,
+                  lineHeight:1 }}>
+                {v}
+              </button>
+            );
+          })}
+          {intent === "+" && heaviestLogged > 0 && (
+            <span style={{ color:"#5aaa5a", fontSize:10 }}>
+              → ~{Math.ceil(heaviestLogged * 1.05 / 5) * 5} lbs
+            </span>
+          )}
+        </div>
+      )}
     </div>
   );
 }
 
-function RoundCard({ round, roundIdx, loggedSets, exHistory, phase, onAddSet, onUpdateSet }) {
+function RoundCard({ round, roundIdx, loggedSets, exHistory, phase, onAddSet, onUpdateSet, intents, onSetIntent }) {
   const [open, setOpen] = useState(roundIdx === 0);
   const isWarmup = roundIdx === 0;
   const filled = round.exercises.filter(ex => (loggedSets[ex.id]||[]).some(s => s.reps)).length;
@@ -742,6 +850,8 @@ function RoundCard({ round, roundIdx, loggedSets, exHistory, phase, onAddSet, on
                 recommendation={rec}
                 onAddSet={() => onAddSet(ex.id)}
                 onUpdateSet={(i, field, val) => onUpdateSet(ex.id, i, field, val)}
+                intent={isWarmup ? undefined : (intents||{})[ex.id]}
+                onSetIntent={isWarmup ? undefined : onSetIntent}
               />
             );
           })}
@@ -819,6 +929,7 @@ function PostSessionChat({ workout, rounds, loggedSets, meta }) {
 // ─────────────────────────────────────────────
 function SessionView({ workout, meta, exHistory, onBack, onComplete }) {
   const [loggedSets, setLoggedSets] = useState({});
+  const [intents, setIntents] = useState({});
   const [done, setDone] = useState(false);
   const rounds = buildRounds(workout, meta.sessionCount);
   const addSet = (exId) =>
@@ -829,8 +940,10 @@ function SessionView({ workout, meta, exHistory, onBack, onComplete }) {
       sets[i] = { ...sets[i], [field]:val };
       return { ...prev, [exId]:sets };
     });
+  const setIntent = (exId, val) =>
+    setIntents(prev => ({ ...prev, [exId]: prev[exId] === val ? null : val }));
   const totalLogged = Object.values(loggedSets).filter(s => s.some(x => x.reps)).length;
-  const handleFinish = () => { setDone(true); onComplete(workout.id, loggedSets, rounds); };
+  const handleFinish = () => { setDone(true); onComplete(workout.id, loggedSets, rounds, null, intents); };
   return (
     <div>
       <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:16 }}>
@@ -847,7 +960,8 @@ function SessionView({ workout, meta, exHistory, onBack, onComplete }) {
       </div>
       {rounds.map((r, i) => (
         <RoundCard key={i} round={r} roundIdx={i} loggedSets={loggedSets}
-          exHistory={exHistory} phase={meta.phase} onAddSet={addSet} onUpdateSet={updateSet} />
+          exHistory={exHistory} phase={meta.phase} onAddSet={addSet} onUpdateSet={updateSet}
+          intents={intents} onSetIntent={setIntent} />
       ))}
       {!done ? (
         <button onClick={handleFinish} disabled={totalLogged === 0}
@@ -874,6 +988,7 @@ function SessionView({ workout, meta, exHistory, onBack, onComplete }) {
 // ─────────────────────────────────────────────
 function CustomSessionView({ sections, meta, exHistory, onBack, onComplete }) {
   const [loggedSets, setLoggedSets] = useState({});
+  const [intents, setIntents] = useState({});
   const [done, setDone] = useState(false);
   const [openSections, setOpenSections] = useState(() => {
     const o = {};
@@ -889,6 +1004,8 @@ function CustomSessionView({ sections, meta, exHistory, onBack, onComplete }) {
       sets[i] = { ...sets[i], [field]:val };
       return { ...prev, [exId]:sets };
     });
+  const setIntent = (exId, val) =>
+    setIntents(prev => ({ ...prev, [exId]: prev[exId] === val ? null : val }));
 
   const totalLogged = Object.values(loggedSets).filter(s => s.some(x => x.reps)).length;
   const allExercises = sections.flatMap(s => s.exercises);
@@ -898,7 +1015,7 @@ function CustomSessionView({ sections, meta, exHistory, onBack, onComplete }) {
 
   const handleFinish = () => {
     setDone(true);
-    onComplete("custom", loggedSets, fakeRounds, fakeWorkout.focus);
+    onComplete("custom", loggedSets, fakeRounds, fakeWorkout.focus, intents);
   };
 
   return (
@@ -941,6 +1058,8 @@ function CustomSessionView({ sections, meta, exHistory, onBack, onComplete }) {
                       recommendation={rec}
                       onAddSet={() => addSet(ex.id)}
                       onUpdateSet={(i, field, val) => updateSet(ex.id, i, field, val)}
+                      intent={isWarmup ? undefined : intents[ex.id]}
+                      onSetIntent={isWarmup ? undefined : setIntent}
                     />
                   );
                 })}
@@ -978,6 +1097,22 @@ function LibraryView({ onBack, onStartCustom }) {
   const [selected, setSelected] = useState({});
   const [expanded, setExpanded] = useState({ 0: true }); // warm-up open by default
   const [search, setSearch] = useState("");
+  const [activeTemplate, setActiveTemplate] = useState(null);
+
+  const applyTemplate = (tmpl) => {
+    if (activeTemplate === tmpl.id) {
+      // toggle off
+      setActiveTemplate(null);
+      setSelected({});
+    } else {
+      setActiveTemplate(tmpl.id);
+      const newSel = {};
+      Object.entries(tmpl.selections).forEach(([gi, ids]) => {
+        newSel[parseInt(gi)] = new Set(ids);
+      });
+      setSelected(newSel);
+    }
+  };
 
   const totalSelected = Object.values(selected).reduce((sum, set) => sum + set.size, 0);
 
@@ -1024,6 +1159,26 @@ function LibraryView({ onBack, onStartCustom }) {
             Clear
           </button>
         )}
+      </div>
+
+      {/* Templates */}
+      <div style={{ marginBottom:14 }}>
+        <div style={{ color:"#444", fontSize:10, textTransform:"uppercase", letterSpacing:2, marginBottom:8 }}>Start from a template</div>
+        <div style={{ display:"flex", gap:8, overflowX:"auto", paddingBottom:6, WebkitOverflowScrolling:"touch" }}>
+          {TEMPLATES.map(tmpl => {
+            const isActive = activeTemplate === tmpl.id;
+            return (
+              <div key={tmpl.id} onClick={() => applyTemplate(tmpl)}
+                style={{ flexShrink:0, background: isActive ? `${tmpl.color}22` : "#0d0d0d",
+                  border:`1px solid ${isActive ? tmpl.color : "#2a2a2a"}`,
+                  borderRadius:8, padding:"10px 12px", cursor:"pointer", minWidth:130, maxWidth:150 }}>
+                <div style={{ fontSize:18, marginBottom:4 }}>{tmpl.icon}</div>
+                <div style={{ color: isActive ? tmpl.color : "#888", fontSize:12, fontWeight:700, lineHeight:1.2 }}>{tmpl.name}</div>
+                <div style={{ color:"#333", fontSize:10, marginTop:3 }}>{tmpl.desc}</div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* Search */}
@@ -1162,6 +1317,234 @@ function AllView({ onPick, onBack }) {
 }
 
 // ─────────────────────────────────────────────
+// CARDIO VIEW
+// ─────────────────────────────────────────────
+function CardioView({ exHistory, onBack, onComplete }) {
+  const [activity, setActivity] = useState(null);
+  const [fields, setFields] = useState({ time:"", distance:"", heartRate:"", intensity:5 });
+  const [intent, setIntentState] = useState(null);
+  const [notes, setNotes] = useState("");
+  const [done, setDone] = useState(false);
+  const [chatStarted, setChatStarted] = useState(false);
+  const [msgs, setMsgs] = useState([]);
+  const [chatInput, setChatInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const bottomRef = useRef(null);
+
+  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior:"smooth" }); }, [msgs]);
+
+  const update = (field, val) => setFields(prev => ({ ...prev, [field]: val }));
+  const toggleIntent = (v) => setIntentState(prev => prev === v ? null : v);
+
+  const hasData = fields.time || fields.distance || fields.heartRate;
+
+  const handleFinish = () => {
+    setDone(true);
+    onComplete("cardio", {}, [], `Cardio: ${activity.name}`, {}, { activity, fields, intent, notes });
+  };
+
+  const startChat = async () => {
+    setChatStarted(true); setLoading(true);
+    const prompt = `You are a direct, no-fluff endurance coach. The athlete is a competitive ultra-endurance paddler (Yukon 1000 5th place) rebuilding fitness.
+Activity: ${activity.name}
+Duration: ${fields.time || "not logged"}
+Distance: ${fields.distance || "not logged"}
+Avg Heart Rate: ${fields.heartRate || "not logged"}
+Intensity (1-10): ${fields.intensity}
+Intent next time: ${intent === "+" ? "push harder" : intent === "-" ? "back off" : intent === "=" ? "same effort" : "not set"}
+Athlete notes: ${notes || "none"}
+
+Give specific feedback on this session. 3–5 sentences.`;
+    const reply = await callClaude([{ role:"user", content: prompt }]);
+    setMsgs([{ role:"assistant", content:reply }]);
+    setLoading(false);
+  };
+
+  const sendChat = async () => {
+    if (!chatInput.trim() || loading) return;
+    const userMsg = { role:"user", content:chatInput };
+    const history = [...msgs, userMsg];
+    setMsgs(history); setChatInput(""); setLoading(true);
+    const reply = await callClaude(history);
+    setMsgs([...history, { role:"assistant", content:reply }]);
+    setLoading(false);
+  };
+
+  // ─── Activity Picker ───
+  if (!activity) {
+    return (
+      <div>
+        <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:20 }}>
+          <button onClick={onBack} style={{ background:"none", border:"1px solid #2a2a2a", color:"#555", borderRadius:6, padding:"5px 10px", cursor:"pointer", fontSize:12 }}>← Back</button>
+          <div style={{ color:"#c8b870", fontSize:17, fontWeight:700 }}>Cardio Session</div>
+        </div>
+        <div style={{ color:"#555", fontSize:12, marginBottom:16 }}>Choose your activity</div>
+        {CARDIO_ACTIVITIES.map(act => {
+          const lastSessions = exHistory[act.id] || [];
+          const last = lastSessions.length > 0 ? lastSessions[lastSessions.length - 1] : null;
+          return (
+            <div key={act.id} onClick={() => setActivity(act)}
+              style={{ background:"#0d0d0d", border:"1px solid #1e1e1e", borderRadius:8, padding:"14px 16px", marginBottom:8, cursor:"pointer" }}>
+              <div style={{ display:"flex", alignItems:"center", gap:14 }}>
+                <span style={{ fontSize:28 }}>{act.icon}</span>
+                <div style={{ flex:1 }}>
+                  <div style={{ color:"#c8c8a0", fontSize:15, fontWeight:600 }}>{act.name}</div>
+                  {last && (
+                    <div style={{ color:"#333", fontSize:11, marginTop:2 }}>
+                      Last: {new Date(last.date).toLocaleDateString("en-US",{month:"short",day:"numeric"})}
+                      {last.fields?.time ? ` · ${last.fields.time}` : ""}
+                      {last.fields?.distance ? ` · ${last.fields.distance}` : ""}
+                    </div>
+                  )}
+                </div>
+                <span style={{ color:"#333", fontSize:14 }}>→</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
+  // ─── Logging Form ───
+  const lastSessions = exHistory[activity.id] || [];
+  const lastCardio = lastSessions.length > 0 ? lastSessions[lastSessions.length - 1] : null;
+
+  return (
+    <div>
+      <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:16 }}>
+        <button onClick={() => setActivity(null)} style={{ background:"none", border:"1px solid #2a2a2a", color:"#555", borderRadius:6, padding:"5px 10px", cursor:"pointer", fontSize:12 }}>← Back</button>
+        <div>
+          <div style={{ color:"#5a8aaa", fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:1 }}>{activity.icon} Cardio</div>
+          <div style={{ color:"#d0c090", fontSize:17, fontWeight:700 }}>{activity.name}</div>
+        </div>
+      </div>
+
+      {/* Previous session */}
+      {lastCardio && (
+        <div style={{ background:"#111a11", border:"1px solid #2a4a2a33", borderRadius:6, padding:"8px 12px", marginBottom:12 }}>
+          <div style={{ color:"#4a6a4a", fontSize:10, marginBottom:3 }}>Last: {new Date(lastCardio.date).toLocaleDateString("en-US",{month:"short",day:"numeric"})}</div>
+          <div style={{ color:"#888", fontSize:12 }}>
+            {[lastCardio.fields?.time, lastCardio.fields?.distance && `${lastCardio.fields.distance}`, lastCardio.fields?.heartRate && `HR ${lastCardio.fields.heartRate}`, `Intensity ${lastCardio.fields?.intensity}/10`].filter(Boolean).join(" · ")}
+          </div>
+          {lastCardio.nextIntent && (
+            <div style={{ color: lastCardio.nextIntent==="+" ? "#5aaa5a" : lastCardio.nextIntent==="-" ? "#aa5a5a" : "#5a5aaa", fontSize:10, marginTop:3 }}>
+              You flagged: {lastCardio.nextIntent==="+" ? "↑ push harder" : lastCardio.nextIntent==="-" ? "↓ back off" : "= same effort"}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Fields */}
+      <div style={{ background:"#0d0d0d", border:"1px solid #1e1e1e", borderRadius:8, padding:14, marginBottom:10 }}>
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:12 }}>
+          <div>
+            <div style={{ color:"#555", fontSize:10, marginBottom:4 }}>TIME</div>
+            <input placeholder="e.g. 1h 30m" value={fields.time} onChange={e => update("time",e.target.value)}
+              style={{ width:"100%", boxSizing:"border-box", background:"#181818", border:"1px solid #2a2a2a", borderRadius:4, color:"#c8c8a0", padding:"6px 8px", fontSize:13 }} />
+          </div>
+          <div>
+            <div style={{ color:"#555", fontSize:10, marginBottom:4 }}>DISTANCE</div>
+            <input placeholder="e.g. 12 mi" value={fields.distance} onChange={e => update("distance",e.target.value)}
+              style={{ width:"100%", boxSizing:"border-box", background:"#181818", border:"1px solid #2a2a2a", borderRadius:4, color:"#c8c8a0", padding:"6px 8px", fontSize:13 }} />
+          </div>
+          <div>
+            <div style={{ color:"#555", fontSize:10, marginBottom:4 }}>AVG HEART RATE</div>
+            <input placeholder="e.g. 145 bpm" value={fields.heartRate} onChange={e => update("heartRate",e.target.value)}
+              style={{ width:"100%", boxSizing:"border-box", background:"#181818", border:"1px solid #2a2a2a", borderRadius:4, color:"#c8c8a0", padding:"6px 8px", fontSize:13 }} />
+          </div>
+          <div>
+            <div style={{ color:"#555", fontSize:10, marginBottom:6 }}>INTENSITY — {fields.intensity}/10</div>
+            <input type="range" min={1} max={10} value={fields.intensity} onChange={e => update("intensity",e.target.value)}
+              style={{ width:"100%", accentColor:"#c8b870" }} />
+          </div>
+        </div>
+
+        {/* Intent */}
+        <div style={{ marginBottom:12 }}>
+          <div style={{ color:"#555", fontSize:10, marginBottom:6 }}>NEXT SESSION INTENT</div>
+          <div style={{ display:"flex", gap:8 }}>
+            {["-","=","+"].map(v => {
+              const active = intent === v;
+              const col = v==="+" ? "#5aaa5a" : v==="-" ? "#aa5a5a" : "#5a5aaa";
+              const bg  = v==="+" ? "#0d1f0d"  : v==="-" ? "#1f0d0d"  : "#0d0d1f";
+              return (
+                <button key={v} onClick={() => toggleIntent(v)}
+                  style={{ flex:1, background: active ? bg : "#181818",
+                    border:`1px solid ${active ? col : "#2a2a2a"}`,
+                    color: active ? col : "#555",
+                    borderRadius:6, padding:"10px 0", cursor:"pointer", fontSize:18, fontWeight:700 }}>
+                  {v==="+" ? "↑" : v==="-" ? "↓" : "="}
+                </button>
+              );
+            })}
+          </div>
+          {intent && <div style={{ color:"#555", fontSize:11, marginTop:5, textAlign:"center" }}>
+            {intent==="+" ? "Push harder next time" : intent==="-" ? "Back off next time" : "Same effort next time"}
+          </div>}
+        </div>
+
+        {/* Notes */}
+        <div>
+          <div style={{ color:"#555", fontSize:10, marginBottom:4 }}>NOTES TO COACH</div>
+          <textarea value={notes} onChange={e => setNotes(e.target.value)}
+            placeholder="How'd it feel? Any issues? Weather, terrain, heart rate spikes..."
+            style={{ width:"100%", boxSizing:"border-box", background:"#181818", border:"1px solid #2a2a2a",
+              borderRadius:4, color:"#c8c8a0", padding:"8px 10px", fontSize:13,
+              minHeight:70, resize:"vertical", fontFamily:"inherit" }} />
+        </div>
+      </div>
+
+      {/* Finish */}
+      {!done ? (
+        <button onClick={handleFinish} disabled={!hasData}
+          style={{ width:"100%", background: hasData ? "#c8b870" : "#1a1a1a",
+            color: hasData ? "#1a1a00" : "#333", border:"none", borderRadius:8, padding:14,
+            fontSize:15, fontWeight:700, cursor: hasData ? "pointer" : "not-allowed", marginBottom:10 }}>
+          {hasData ? "Log Cardio Session" : "Fill in at least one field"}
+        </button>
+      ) : (
+        <>
+          <div style={{ background:"#0d150d", border:"1px solid #2a4a2a", borderRadius:8, padding:14, marginBottom:10 }}>
+            <div style={{ color:"#6aaa6a", fontWeight:700, marginBottom:3 }}>✓ Session saved</div>
+            <div style={{ color:"#555", fontSize:12 }}>Talk to the coach below.</div>
+          </div>
+          {!chatStarted ? (
+            <button onClick={startChat}
+              style={{ width:"100%", background:"#101a10", border:"1px solid #2a4a2a", color:"#6aaa6a", borderRadius:8, padding:14, fontSize:14, cursor:"pointer", fontWeight:600 }}>
+              🤖 Get Coaching Feedback
+            </button>
+          ) : (
+            <div style={{ background:"#0a0f0a", border:"1px solid #1a2a1a", borderRadius:8, overflow:"hidden" }}>
+              <div style={{ maxHeight:300, overflowY:"auto", padding:14 }}>
+                {msgs.map((m,i) => (
+                  <div key={i} style={{ marginBottom:14 }}>
+                    <div style={{ color:m.role==="assistant"?"#6aaa6a":"#c8b870", fontSize:10, fontWeight:700, marginBottom:3, textTransform:"uppercase", letterSpacing:1 }}>
+                      {m.role==="assistant" ? "Coach" : "You"}
+                    </div>
+                    <div style={{ color:"#aaa", fontSize:13, lineHeight:1.6, whiteSpace:"pre-wrap" }}>{m.content}</div>
+                  </div>
+                ))}
+                {loading && <div style={{ color:"#3a5a3a", fontSize:13, fontStyle:"italic" }}>Thinking...</div>}
+                <div ref={bottomRef} />
+              </div>
+              <div style={{ display:"flex", gap:8, padding:"10px 14px", borderTop:"1px solid #1a2a1a" }}>
+                <input value={chatInput} onChange={e => setChatInput(e.target.value)}
+                  onKeyDown={e => e.key==="Enter" && !e.shiftKey && sendChat()}
+                  placeholder="Heart rate stayed high, legs felt heavy..."
+                  style={{ flex:1, background:"#111", border:"1px solid #2a2a2a", borderRadius:6, color:"#c0c0a0", padding:"8px 12px", fontSize:13 }} />
+                <button onClick={sendChat} disabled={loading}
+                  style={{ background:"#1a2a1a", border:"1px solid #3a5a3a", color:"#6aaa6a", borderRadius:6, padding:"8px 14px", cursor:"pointer", fontSize:14, fontWeight:700 }}>→</button>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────
 // APP
 // ─────────────────────────────────────────────
 export default function App() {
@@ -1191,27 +1574,39 @@ export default function App() {
 
   const startCustom = (sections) => { setCustomSections(sections); setView("custom-session"); };
 
-  const handleComplete = async (workoutId, loggedSets, rounds, customFocus) => {
+  const startCardio = () => setView("cardio");
+
+  const handleComplete = async (workoutId, loggedSets, rounds, customFocus, intents = {}, cardioData = null) => {
     const workout = workoutId === "custom"
       ? { name:"Custom Build", focus: customFocus || "Custom" }
+      : workoutId === "cardio"
+      ? { name:`Cardio: ${cardioData?.activity?.name || "Session"}`, focus:"Cardio" }
       : WORKOUTS.find(w => w.id === workoutId);
     const key = new Date().toISOString();
     const newCount = meta.sessionCount + 1;
     const newPhase = newCount >= 17 ? 3 : newCount >= 9 ? 2 : 1;
-    const newMeta = { phase:newPhase, sessionCount:newCount, lastWorkoutId: workoutId !== "custom" ? workoutId : meta.lastWorkoutId };
+    const newMeta = { phase:newPhase, sessionCount:newCount, lastWorkoutId: (workoutId !== "custom" && workoutId !== "cardio") ? workoutId : meta.lastWorkoutId };
     const newExHistory = { ...exHistory };
     rounds.forEach(round => {
-      round.exercises.forEach(ex => {
+      (round.exercises || []).forEach(ex => {
         const sets = (loggedSets[ex.id] || []).filter(s => s.reps);
         if (sets.length) {
           if (!newExHistory[ex.id]) newExHistory[ex.id] = [];
-          newExHistory[ex.id] = [...newExHistory[ex.id], { date:key, sets }].slice(-10);
+          newExHistory[ex.id] = [...newExHistory[ex.id], { date:key, sets, nextIntent: intents[ex.id] || null }].slice(-10);
         }
       });
     });
+    // Cardio sessions stored in exHistory by activity id
+    if (cardioData && cardioData.activity) {
+      const actId = cardioData.activity.id;
+      if (!newExHistory[actId]) newExHistory[actId] = [];
+      newExHistory[actId] = [...newExHistory[actId], {
+        date: key, fields: cardioData.fields, nextIntent: cardioData.intent || null, notes: cardioData.notes || ""
+      }].slice(-10);
+    }
     const newLog = { ...log, [key]: {
       workoutName: workout.name,
-      exerciseCount: Object.values(loggedSets).filter(s => s.some(x => x.reps)).length
+      exerciseCount: cardioData ? 1 : Object.values(loggedSets).filter(s => s.some(x => x.reps)).length
     }};
     setMeta(newMeta); setLog(newLog); setExHistory(newExHistory);
     await Promise.all([
@@ -1231,7 +1626,9 @@ export default function App() {
 
   return (
     <div style={{ background:"#080808", minHeight:"100vh", fontFamily:"'SF Mono','Fira Code',monospace", color:"#e0e0e0" }}>
-      <div style={{ maxWidth:480, margin:"0 auto", padding:"20px 16px 60px" }}>
+      <div style={{ maxWidth:480, margin:"0 auto",
+        paddingTop:"calc(env(safe-area-inset-top) + 20px)",
+        paddingLeft:16, paddingRight:16, paddingBottom:60 }}>
 
         {view === "home" && <>
           <div style={{ marginBottom:20 }}>
@@ -1261,15 +1658,27 @@ export default function App() {
           {/* Build Workout card — full width */}
           <div onClick={() => setView("library")}
             style={{ background:"linear-gradient(135deg, #0d1a0d, #0d0d0d)", border:"1px solid #2a4a2a",
-              borderRadius:8, padding:"14px 16px", cursor:"pointer", display:"flex", alignItems:"center", gap:14 }}>
+              borderRadius:8, padding:"14px 16px", cursor:"pointer", display:"flex", alignItems:"center", gap:14, marginBottom:10 }}>
             <span style={{ fontSize:24 }}>🏗</span>
             <div style={{ flex:1 }}>
               <div style={{ color:"#6aaa6a", fontWeight:700, fontSize:14 }}>Build Custom Workout</div>
               <div style={{ color:"#333", fontSize:11 }}>
-                {EXERCISE_LIBRARY.reduce((n, g) => n + g.exercises.length, 0)} exercises · pick by muscle group · warm-up included
+                {EXERCISE_LIBRARY.reduce((n, g) => n + g.exercises.length, 0)} exercises · {TEMPLATES.length} templates · warm-up included
               </div>
             </div>
             <span style={{ color:"#2a4a2a", fontSize:18 }}>→</span>
+          </div>
+
+          {/* Cardio card */}
+          <div onClick={startCardio}
+            style={{ background:"linear-gradient(135deg, #0d1520, #0d0d0d)", border:"1px solid #2a3a5a",
+              borderRadius:8, padding:"14px 16px", cursor:"pointer", display:"flex", alignItems:"center", gap:14 }}>
+            <span style={{ fontSize:24 }}>🌊</span>
+            <div style={{ flex:1 }}>
+              <div style={{ color:"#6a8aaa", fontWeight:700, fontSize:14 }}>Log Cardio Session</div>
+              <div style={{ color:"#333", fontSize:11 }}>Hiking · Mountain Biking · Kayaking · SUP · ERG · Road Biking</div>
+            </div>
+            <span style={{ color:"#2a3a5a", fontSize:18 }}>→</span>
           </div>
         </>}
 
@@ -1284,6 +1693,7 @@ export default function App() {
         {view === "history" && <HistoryView log={log} onBack={() => setView("home")} />}
         {view === "all" && <AllView onPick={startWorkout} onBack={() => setView("home")} />}
         {view === "library" && <LibraryView onBack={() => setView("home")} onStartCustom={startCustom} />}
+        {view === "cardio" && <CardioView exHistory={exHistory} onBack={() => setView("home")} onComplete={handleComplete} />}
       </div>
     </div>
   );
