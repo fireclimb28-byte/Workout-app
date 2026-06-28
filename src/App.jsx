@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from "react";
 
 // ─────────────────────────────────────────────
-// EXERCISE BANKS
+// EXISTING WORKOUTS (unchanged)
 // ─────────────────────────────────────────────
 const WORKOUTS = [
   {
@@ -257,7 +257,6 @@ const WORKOUTS = [
   },
 ];
 
-// Sequence for "Up Next" — main 6 workouts in order, supplements optional
 const SEQUENCE = [1, 3, 2, 4, 6, 5];
 
 const PHASE = {
@@ -265,6 +264,278 @@ const PHASE = {
   2: { name:"Build",      range:"Sessions 9–16", sets:3, repsLow:8,  repsHigh:10, intensity:"~70% effort. Add weight when you hit top of range two sessions running." },
   3: { name:"Strength",   range:"Sessions 17+",  sets:4, repsLow:5,  repsHigh:8,  intensity:"~80% effort. Push closer to failure. Deload every 4th week." },
 };
+
+// ─────────────────────────────────────────────
+// EXERCISE LIBRARY — organized by muscle group
+// ─────────────────────────────────────────────
+const EXERCISE_LIBRARY = [
+  {
+    group: "Warm-Up",
+    icon: "🔥",
+    color: "#c87830",
+    description: "Bodyweight movement prep — pick 4–6",
+    exercises: [
+      { id:"wu-1",  name:"Jumping Jacks",             note:"2 min, light pace — elevate heart rate",        bw:true },
+      { id:"wu-2",  name:"Arm Circles",                note:"10 fwd + 10 back — shoulder mobility",          bw:true },
+      { id:"wu-3",  name:"Leg Swings",                 note:"10 each leg, front-back + side-side",           bw:true },
+      { id:"wu-4",  name:"Hip Circles",                note:"10 each direction — loosen hips",               bw:true },
+      { id:"wu-5",  name:"Cat-Cow",                    note:"10 slow reps — thoracic mobility",              bw:true },
+      { id:"wu-6",  name:"Bear Crawl Walkouts",        note:"5 reps — shoulder + hamstring",                 bw:true },
+      { id:"wu-7",  name:"Mountain Climbers",          note:"20 reps slow — hip flexor activation",          bw:true },
+      { id:"wu-8",  name:"Bodyweight Squat",           note:"10 reps, full depth, slow",                     bw:true },
+      { id:"wu-9",  name:"Dead Hang",                  note:"30s — shoulder decompression",                  bw:true },
+      { id:"wu-10", name:"Inchworm",                   note:"5 reps — hamstring + shoulder flow",            bw:true },
+      { id:"wu-11", name:"Glute Bridge (BW)",          note:"15 reps — activate posterior chain",            bw:true },
+      { id:"wu-12", name:"High Knees",                 note:"30s — heart rate + hip flexors",                bw:true },
+      { id:"wu-13", name:"World's Greatest Stretch",   note:"5 reps each side — full body opener",          bw:true },
+      { id:"wu-14", name:"Wrist Circles",              note:"10 each direction — prep for pressing",         bw:true },
+      { id:"wu-15", name:"Hip Flexor Stretch",         note:"30s each side — kneeling lunge",                bw:true },
+      { id:"wu-16", name:"Hollow Body Hold",           note:"20s — core + posterior chain activation",       bw:true },
+      { id:"wu-17", name:"Shoulder Rolls",             note:"10 fwd + 10 back",                              bw:true },
+      { id:"wu-18", name:"Scapular Push-Ups",          note:"10 reps — serratus activation",                 bw:true },
+    ],
+  },
+  {
+    group: "Chest",
+    icon: "💪",
+    color: "#aa5a5a",
+    description: "Push — horizontal & incline pressing",
+    exercises: [
+      { id:"ch-1",  name:"Bench Press (Barbell)",          note:"Flat — control descent, drive through" },
+      { id:"ch-2",  name:"Incline Bench Press (BB)",       note:"30–45° — upper chest emphasis" },
+      { id:"ch-3",  name:"Decline Bench Press",            note:"Lower chest focus" },
+      { id:"ch-4",  name:"Dumbbell Bench Press",           note:"Greater ROM than barbell" },
+      { id:"ch-5",  name:"Incline Dumbbell Press",         note:"Neutral or pronated grip" },
+      { id:"ch-6",  name:"Push-Up",                        note:"Full ROM, elbows at 45°",                  bw:true },
+      { id:"ch-7",  name:"Wide-Grip Push-Up",              note:"Hands outside shoulders — more chest",     bw:true },
+      { id:"ch-8",  name:"Diamond Push-Up",                note:"Hands together — inner chest + triceps",   bw:true },
+      { id:"ch-9",  name:"Elevated Push-Up",               note:"Feet on bench — upper chest",              bw:true },
+      { id:"ch-10", name:"Dips (Chest Focus)",             note:"Lean forward, elbows flared",              bw:true },
+      { id:"ch-11", name:"Cable Chest Fly",                note:"Constant tension, full arc" },
+      { id:"ch-12", name:"Pec Deck",                       note:"Machine — squeeze at top, slow eccentric" },
+      { id:"ch-13", name:"Dumbbell Fly",                   note:"Bench — stretch at bottom, light" },
+      { id:"ch-14", name:"Dumbbell Pullover",              note:"Chest + serratus stretch" },
+      { id:"ch-15", name:"Low-to-High Cable Fly",          note:"Incline emphasis via cable angle" },
+      { id:"ch-16", name:"Svend Press",                    note:"Squeeze plates together throughout" },
+      { id:"ch-17", name:"Smith Machine Bench Press",      note:"Good for controlled groove learning" },
+      { id:"ch-18", name:"Clap Push-Up",                   note:"Explosive — power development",            bw:true },
+    ],
+  },
+  {
+    group: "Back",
+    icon: "🔙",
+    color: "#5a7aaa",
+    description: "Pull — lats, rhomboids, traps, lower back",
+    exercises: [
+      { id:"bk-1",  name:"Pull-Up (Wide Grip)",            note:"Dead hang, full ROM — lat width",          bw:true },
+      { id:"bk-2",  name:"Pull-Up (Narrow / Neutral)",     note:"More lower lat + bicep",                   bw:true },
+      { id:"bk-3",  name:"Chin-Up",                        note:"Supinated grip — more bicep involvement",  bw:true },
+      { id:"bk-4",  name:"Lat Pulldown (Wide Grip)",       note:"Pull to collarbone" },
+      { id:"bk-5",  name:"Lat Pulldown (Narrow Grip)",     note:"More lower lat activation" },
+      { id:"bk-6",  name:"Barbell Row (Bent Over)",        note:"Hinge to 45°, no hip pop" },
+      { id:"bk-7",  name:"Dumbbell Row (One-Arm)",         note:"Full stretch at bottom, explosive pull" },
+      { id:"bk-8",  name:"Seated Cable Row",               note:"Elbows in, squeeze scapula at top" },
+      { id:"bk-9",  name:"Wide-Grip Seated Cable Row",     note:"More upper back, elbows flared" },
+      { id:"bk-10", name:"T-Bar Row",                      note:"Chest on pad or free-standing" },
+      { id:"bk-11", name:"Inverted Row",                   note:"Body horizontal, heels on ground",         bw:true },
+      { id:"bk-12", name:"Straight Arm Pulldown",          note:"Lat isolation — keep arms straight" },
+      { id:"bk-13", name:"Face Pulls",                     note:"External rotation + rear delt health" },
+      { id:"bk-14", name:"Hyperextensions",                note:"Lower back + glutes — control descent" },
+      { id:"bk-15", name:"Deadlift (Conventional)",        note:"Full body — king of back builders" },
+      { id:"bk-16", name:"Rack Pulls",                     note:"Partial range — heavy load tolerance" },
+      { id:"bk-17", name:"Scapular Pull-Up",               note:"Active scapula, no elbow bend",            bw:true },
+      { id:"bk-18", name:"Gorilla Row",                    note:"Alternating KB row — anti-rotation" },
+    ],
+  },
+  {
+    group: "Shoulders",
+    icon: "🏋️",
+    color: "#8a5aaa",
+    description: "Press, raise, and rotation",
+    exercises: [
+      { id:"sh-1",  name:"Overhead Press (Barbell)",       note:"Strict — no leg drive" },
+      { id:"sh-2",  name:"Overhead Press (Dumbbell)",      note:"Seated or standing, neutral grip" },
+      { id:"sh-3",  name:"Arnold Press",                   note:"Rotate from neutral to pronated" },
+      { id:"sh-4",  name:"Lateral Raise",                  note:"Light, slow, stop at shoulder height" },
+      { id:"sh-5",  name:"Cable Lateral Raise",            note:"Unilateral, constant tension" },
+      { id:"sh-6",  name:"Front Raise",                    note:"Alternate or bilateral, controlled" },
+      { id:"sh-7",  name:"Rear Delt Fly",                  note:"Hinge, elbows out, squeeze" },
+      { id:"sh-8",  name:"Reverse Cable Fly",              note:"Cross-cable or machine" },
+      { id:"sh-9",  name:"Face Pulls",                     note:"External rotation — rear delt health" },
+      { id:"sh-10", name:"Upright Row",                    note:"Elbows above wrists" },
+      { id:"sh-11", name:"Pike Push-Up",                   note:"Inverted V — shoulder press pattern",     bw:true },
+      { id:"sh-12", name:"Handstand Push-Up",              note:"Wall-supported or freestanding",          bw:true },
+      { id:"sh-13", name:"Machine Shoulder Press",         note:"Guided path — good for beginners" },
+      { id:"sh-14", name:"Shoulder Halo Raises",           note:"Plate or DB — 360° arc" },
+      { id:"sh-15", name:"Plate Lateral Raise",            note:"Slower than DB — good tension" },
+    ],
+  },
+  {
+    group: "Biceps",
+    icon: "💪",
+    color: "#5a8aaa",
+    description: "Elbow flexion — peak + thickness",
+    exercises: [
+      { id:"bi-1",  name:"Barbell Curl",                   note:"Full ROM, no swing" },
+      { id:"bi-2",  name:"Dumbbell Curl (Alternating)",    note:"Supinate at top of each rep" },
+      { id:"bi-3",  name:"Hammer Curl",                    note:"Neutral grip — brachialis + brachioradialis" },
+      { id:"bi-4",  name:"Simultaneous Hammer Curl",       note:"Both arms together" },
+      { id:"bi-5",  name:"Preacher Curl (EZ-bar)",         note:"Isolation — no cheating at bottom" },
+      { id:"bi-6",  name:"Concentration Curl",             note:"Seated, elbow on inner thigh" },
+      { id:"bi-7",  name:"Cable Curl",                     note:"Consistent tension through full ROM" },
+      { id:"bi-8",  name:"Incline Dumbbell Curl",          note:"Full stretch at bottom" },
+      { id:"bi-9",  name:"Reverse Curl",                   note:"Pronated grip — brachioradialis focus" },
+      { id:"bi-10", name:"Chin-Up",                        note:"Best compound bicep builder",              bw:true },
+      { id:"bi-11", name:"Drag Curl",                      note:"Elbows back, bar drags up torso" },
+      { id:"bi-12", name:"Bicep Curl with Band",           note:"Accommodating resistance" },
+    ],
+  },
+  {
+    group: "Triceps",
+    icon: "💪",
+    color: "#aa6a5a",
+    description: "Elbow extension — mass + definition",
+    exercises: [
+      { id:"tr-1",  name:"Tricep Pushdown (Cable)",        note:"Elbows pinned, full extension" },
+      { id:"tr-2",  name:"Rope Tricep Pushdown",           note:"Flare out at bottom for stretch" },
+      { id:"tr-3",  name:"Skull Crushers",                 note:"EZ-bar, lower to forehead, slow" },
+      { id:"tr-4",  name:"Overhead Tricep Extension (DB)", note:"Full stretch overhead" },
+      { id:"tr-5",  name:"Close-Grip Bench Press",         note:"Shoulder-width grip — heavy load" },
+      { id:"tr-6",  name:"Dips (Tricep Focus)",            note:"Upright torso, elbows close",              bw:true },
+      { id:"tr-7",  name:"Diamond Push-Up",                note:"Hands forming diamond below chest",         bw:true },
+      { id:"tr-8",  name:"Tricep Kickback",                note:"Hinge, extend fully behind" },
+      { id:"tr-9",  name:"French Press (Bar/EZ-bar)",      note:"Overhead — long head stretch" },
+      { id:"tr-10", name:"Bench Dip",                      note:"Feet elevated for more challenge",         bw:true },
+      { id:"tr-11", name:"Single Arm Tricep Extension",    note:"Cable or DB — unilateral" },
+      { id:"tr-12", name:"Low Bar Tricep Push-Up",         note:"Bar at hip height — angled",               bw:true },
+    ],
+  },
+  {
+    group: "Quads",
+    icon: "🦵",
+    color: "#7a5aaa",
+    description: "Knee extension + squat patterns",
+    exercises: [
+      { id:"qu-1",  name:"Back Squat",                     note:"Full depth, neutral spine" },
+      { id:"qu-2",  name:"Front Squat",                    note:"Elbows high — quad dominant" },
+      { id:"qu-3",  name:"Bulgarian Split Squat",          note:"Rear foot elevated — depth over load" },
+      { id:"qu-4",  name:"Leg Press",                      note:"Feet shoulder-width, full ROM" },
+      { id:"qu-5",  name:"Narrow Leg Press (Quad Focus)",  note:"Feet closer together" },
+      { id:"qu-6",  name:"Leg Extension",                  note:"Isolation — squeeze at top" },
+      { id:"qu-7",  name:"Lunge (Forward)",                note:"Step through, knee tracks over toe" },
+      { id:"qu-8",  name:"Lunge (Reverse)",                note:"Less knee stress than forward" },
+      { id:"qu-9",  name:"Jump Squat",                     note:"Land soft, absorb through hips",           bw:true },
+      { id:"qu-10", name:"Hack Squat (Machine)",           note:"Knees forward, quad crush" },
+      { id:"qu-11", name:"Pistol Squat",                   note:"Single-leg full squat — advanced",         bw:true },
+      { id:"qu-12", name:"Wall Sit",                       note:"Isometric — 30–60s holds",                 bw:true },
+      { id:"qu-13", name:"Step-Ups",                       note:"Box or bench, slow eccentric" },
+      { id:"qu-14", name:"Goblet Squat",                   note:"DB or KB — great for learning depth" },
+      { id:"qu-15", name:"Sissy Squat",                    note:"Extreme quad stretch — advanced",          bw:true },
+      { id:"qu-16", name:"Smith Machine Squat",            note:"Good for learning groove" },
+    ],
+  },
+  {
+    group: "Hamstrings",
+    icon: "🦵",
+    color: "#5aaa7a",
+    description: "Hip hinge + knee flexion",
+    exercises: [
+      { id:"hm-1",  name:"Romanian Deadlift (BB)",         note:"Slight knee bend, feel stretch in hamstrings" },
+      { id:"hm-2",  name:"Romanian Deadlift (DB)",         note:"More balance challenge, greater ROM" },
+      { id:"hm-3",  name:"Stiff-Leg Deadlift",            note:"Straighter legs — max hamstring stretch" },
+      { id:"hm-4",  name:"Lying Leg Curl",                 note:"Slow eccentric — 3 seconds down" },
+      { id:"hm-5",  name:"Seated Leg Curl",                note:"Different hamstring angle than lying" },
+      { id:"hm-6",  name:"Single-Leg RDL",                 note:"BW or DB — hinge + balance" },
+      { id:"hm-7",  name:"Good Mornings",                  note:"Bar on back, hip hinge — keep light" },
+      { id:"hm-8",  name:"Glute Ham Raise",                note:"Eccentric hamstring — advanced",           bw:true },
+      { id:"hm-9",  name:"Deficit Deadlift",               note:"Stand on plate — greater ROM" },
+      { id:"hm-10", name:"Banded RDL",                     note:"Accommodating resistance" },
+      { id:"hm-11", name:"Cable Pull-Through",             note:"Hip hinge with cable between legs" },
+      { id:"hm-12", name:"Lying Leg Curl (Single Leg)",    note:"Unilateral — fix imbalances" },
+    ],
+  },
+  {
+    group: "Glutes",
+    icon: "🍑",
+    color: "#aa5a8a",
+    description: "Hip extension + abduction",
+    exercises: [
+      { id:"gl-1",  name:"Hip Thrust (Barbell)",           note:"Shoulders on bench, drive through heels" },
+      { id:"gl-2",  name:"Hip Thrust (Banded)",            note:"Band across hips for resistance" },
+      { id:"gl-3",  name:"Smith Machine Hip Thrust",       note:"Easy to load, guided path" },
+      { id:"gl-4",  name:"Glute Bridge (Floor)",           note:"BW — squeeze hard at top",                 bw:true },
+      { id:"gl-5",  name:"Single-Leg Hip Thrust",          note:"More glute isolation" },
+      { id:"gl-6",  name:"Single-Leg Glute Bridge",        note:"Floor version — great for warm-up",        bw:true },
+      { id:"gl-7",  name:"Cable Kickback",                 note:"Hip extension — full squeeze at top" },
+      { id:"gl-8",  name:"Glute Kickback (BW)",            note:"Quadruped — slow and controlled",          bw:true },
+      { id:"gl-9",  name:"Fire Hydrant",                   note:"Hip abduction — glute medius",             bw:true },
+      { id:"gl-10", name:"Sumo Squat",                     note:"Wide stance — glute + inner thigh" },
+      { id:"gl-11", name:"Curtsy Lunge",                   note:"Cross behind — glute medius emphasis" },
+      { id:"gl-12", name:"Abductor Machine",               note:"Glute medius isolation" },
+      { id:"gl-13", name:"Bulgarian Split Squat",          note:"Deep hip hinge — posterior emphasis" },
+      { id:"gl-14", name:"Frog Pump",                      note:"Feet together, knees out — BW glute",     bw:true },
+      { id:"gl-15", name:"Side Kickback",                  note:"Standing or cable — lateral emphasis" },
+    ],
+  },
+  {
+    group: "Core",
+    icon: "🎯",
+    color: "#5a5aaa",
+    description: "Stability, anti-rotation, flexion",
+    exercises: [
+      { id:"co-lib-1",  name:"Plank",                      note:"Elbows under shoulders — hollow body",     bw:true },
+      { id:"co-lib-2",  name:"Side Plank",                 note:"Hip stacked, don't sag",                   bw:true },
+      { id:"co-lib-3",  name:"Dead Bug",                   note:"Lower back down — opposite arm/leg",       bw:true },
+      { id:"co-lib-4",  name:"Hollow Body Hold",           note:"Arms overhead, legs straight",             bw:true },
+      { id:"co-lib-5",  name:"Ab Wheel Rollout",           note:"Control the eccentric — don't collapse" },
+      { id:"co-lib-6",  name:"Hanging Leg Raise",          note:"Straight legs or tuck — control descent",  bw:true },
+      { id:"co-lib-7",  name:"Hanging Knee Raise",         note:"Beginner version — tuck knees to chest",   bw:true },
+      { id:"co-lib-8",  name:"L-Sit",                      note:"Parallel bars or floor — hold 10s+",       bw:true },
+      { id:"co-lib-9",  name:"Russian Twist",              note:"Feet off floor, rotate slowly" },
+      { id:"co-lib-10", name:"Weighted Russian Twist",     note:"Add plate or DB" },
+      { id:"co-lib-11", name:"Bicycle Crunch",             note:"Slow — full extension each rep",           bw:true },
+      { id:"co-lib-12", name:"Crunch",                     note:"Short ROM — upper abs only",               bw:true },
+      { id:"co-lib-13", name:"Reverse Crunch",             note:"Hips off floor at top",                    bw:true },
+      { id:"co-lib-14", name:"Leg Raise (Floor)",          note:"Control descent — lower back stays down",  bw:true },
+      { id:"co-lib-15", name:"Windshield Wipers",          note:"Hang or floor — oblique killer",           bw:true },
+      { id:"co-lib-16", name:"Pallof Press",               note:"Anti-rotation — cable or band" },
+      { id:"co-lib-17", name:"Plank Hip Dips",             note:"Side-to-side — obliques",                  bw:true },
+      { id:"co-lib-18", name:"Star Crunch",                note:"Arms + legs extend simultaneously",        bw:true },
+      { id:"co-lib-19", name:"Seated Knee Tuck",           note:"Hands on bench, tuck knees to chest",     bw:true },
+      { id:"co-lib-20", name:"Dragon Flag",                note:"Advanced full-body tension",               bw:true },
+    ],
+  },
+  {
+    group: "Calves",
+    icon: "🦶",
+    color: "#5aaa8a",
+    description: "Ankle plantar flexion",
+    exercises: [
+      { id:"ca-1",  name:"Standing Calf Raise",            note:"Full ROM — pause at top and bottom" },
+      { id:"ca-2",  name:"Single-Leg Calf Raise (BW)",     note:"More range + challenge",                   bw:true },
+      { id:"ca-3",  name:"Single-Leg Calf Raise (DB)",     note:"Add load to single-leg version" },
+      { id:"ca-4",  name:"Seated Calf Raise",              note:"Soleus focus (bent knee position)" },
+      { id:"ca-5",  name:"Weighted Calf Raise",            note:"BB on back or hold DBs" },
+      { id:"ca-6",  name:"Calf Raise on Leg Press",        note:"Full ROM, slow eccentric" },
+    ],
+  },
+  {
+    group: "Forearms",
+    icon: "💪",
+    color: "#8a7a5a",
+    description: "Grip + wrist strength",
+    exercises: [
+      { id:"fa-1",  name:"Barbell Wrist Curl",             note:"Forearms on bench, full ROM" },
+      { id:"fa-2",  name:"Reverse Wrist Curl",             note:"Extensors — balance with flexors" },
+      { id:"fa-3",  name:"Behind-the-Back Wrist Curl",     note:"Bar behind you — greater stretch" },
+      { id:"fa-4",  name:"Hammer Curl",                    note:"Brachioradialis emphasis" },
+      { id:"fa-5",  name:"Reverse Curl",                   note:"Pronated grip — wrist extensors" },
+      { id:"fa-6",  name:"Dead Hang",                      note:"30–60s — grip endurance",                  bw:true },
+      { id:"fa-7",  name:"Farmer's Carry",                 note:"Heavy walk — grip + core" },
+      { id:"fa-8",  name:"Wrist Roller",                   note:"Extend + flex — full forearm" },
+    ],
+  },
+];
 
 // ─────────────────────────────────────────────
 // ROUND BUILDER
@@ -294,37 +565,25 @@ function getRecommendation(exId, exHistory, phase) {
   const last = exHistory[exHistory.length - 1];
   const lastSets = last.sets.filter(s => s.reps);
   if (!lastSets.length) return null;
-
   const lastReps = lastSets.map(s => parseInt(s.reps) || 0);
   const lastWeights = lastSets.map(s => s.weight || "BW");
   const avgReps = Math.round(lastReps.reduce((a, b) => a + b, 0) / lastReps.length);
   const lastWeight = lastWeights[lastWeights.length - 1];
   const isBodyweight = !lastWeight || lastWeight === "BW" || lastWeight === "" || isNaN(parseFloat(lastWeight));
-
   const targetHigh = PHASE[phase].repsHigh;
   const targetLow = PHASE[phase].repsLow;
-
-  let rec = "";
-  let badge = "same";
-
+  let rec = "", badge = "same";
   if (isBodyweight) {
     if (avgReps >= targetHigh) { rec = `Hit ${avgReps} reps — add light load or progress variation`; badge = "up"; }
-    else if (avgReps < targetLow - 2) { rec = `${avgReps} reps last time — focus on form, same variation`; badge = "same"; }
-    else { rec = `${avgReps} reps last time — push for ${Math.min(avgReps + 1, targetHigh)}`; badge = "same"; }
+    else if (avgReps < targetLow - 2) { rec = `${avgReps} reps last time — focus on form, same variation`; }
+    else { rec = `${avgReps} reps last time — push for ${Math.min(avgReps + 1, targetHigh)}`; }
   } else {
     const w = parseFloat(lastWeight);
     if (avgReps >= targetHigh) { const nextW = Math.ceil(w * 1.05 / 2.5) * 2.5; rec = `${avgReps} reps @ ${w} — try ${nextW} lbs`; badge = "up"; }
-    else if (avgReps < targetLow - 1) { const dropW = Math.floor(w * 0.95 / 2.5) * 2.5; rec = `${avgReps} reps @ ${w} — consider dropping to ${dropW} lbs`; badge = "down"; }
-    else { rec = `${avgReps} reps @ ${w} lbs — stay here, push for ${Math.min(avgReps + 1, targetHigh)} reps`; badge = "same"; }
+    else if (avgReps < targetLow - 1) { const dropW = Math.floor(w * 0.95 / 2.5) * 2.5; rec = `${avgReps} reps @ ${w} — consider ${dropW} lbs`; badge = "down"; }
+    else { rec = `${avgReps} reps @ ${w} lbs — stay here, push for ${Math.min(avgReps + 1, targetHigh)} reps`; }
   }
-
-  return {
-    rec,
-    badge,
-    lastDate: new Date(last.date).toLocaleDateString("en-US", { month:"short", day:"numeric" }),
-    lastSets,
-    lastWeights,
-  };
+  return { rec, badge, lastDate: new Date(last.date).toLocaleDateString("en-US", { month:"short", day:"numeric" }), lastSets, lastWeights };
 }
 
 // ─────────────────────────────────────────────
@@ -360,7 +619,7 @@ function buildSystemPrompt(workout, rounds, loggedSets, meta) {
   ).join("\n");
   return `You are a direct, no-fluff strength coach. The athlete has a serious background (competitive ultra-endurance paddler, Yukon 1000 5th place) but is rebuilding base fitness after time off. They know their body. Be specific, brief, and practical.
 
-Workout: ${workout.name} — ${workout.focus}
+Workout: ${workout.name || "Custom"} — ${workout.focus || "Custom Build"}
 Phase: ${phase.name} (${phase.range}) — ${phase.intensity}
 Target: ${phase.sets} sets × ${phase.repsLow}–${phase.repsHigh} reps
 
@@ -371,9 +630,8 @@ Review this log, flag anything off, and suggest next-session targets. 3–5 sent
 }
 
 // ─────────────────────────────────────────────
-// COMPONENTS
+// SHARED COMPONENTS
 // ─────────────────────────────────────────────
-
 function PhaseBar({ meta }) {
   const phase = PHASE[meta.phase];
   const pct = Math.min((meta.sessionCount / 24) * 100, 100);
@@ -396,7 +654,7 @@ function UpNextCard({ workout, onStart }) {
   return (
     <div onClick={() => onStart(workout)}
       style={{ background:`linear-gradient(135deg, #141e14, #0d0d0d)`, border:`1px solid ${workout.color}55`,
-        borderRadius:10, padding:"16px 18px", marginBottom:16, cursor:"pointer", transition:"all 0.15s" }}>
+        borderRadius:10, padding:"16px 18px", marginBottom:16, cursor:"pointer" }}>
       <div style={{ color:"#555", fontSize:10, textTransform:"uppercase", letterSpacing:2, marginBottom:6 }}>Up Next</div>
       <div style={{ display:"flex", alignItems:"center", gap:12 }}>
         <span style={{ fontSize:28 }}>{workout.icon}</span>
@@ -422,7 +680,6 @@ function ExerciseRow({ ex, sets, recommendation, onAddSet, onUpdateSet }) {
           <div style={{ color:"#3a3a2a", fontSize:11, fontStyle:"italic" }}>{ex.note}</div>
         </div>
       </div>
-
       {recommendation && (
         <div style={{ background:"#111a11", border:`1px solid ${badgeColor[recommendation.badge]}33`,
           borderRadius:6, padding:"7px 10px", marginBottom:8 }}>
@@ -438,7 +695,6 @@ function ExerciseRow({ ex, sets, recommendation, onAddSet, onUpdateSet }) {
           <div style={{ color:"#6aaa6a", fontSize:12, marginTop:3, fontWeight:600 }}>{recommendation.rec}</div>
         </div>
       )}
-
       <div style={{ display:"flex", flexWrap:"wrap", gap:6, alignItems:"center" }}>
         {sets.map((s, i) => (
           <div key={i} style={{ display:"flex", gap:4, alignItems:"center" }}>
@@ -462,7 +718,6 @@ function RoundCard({ round, roundIdx, loggedSets, exHistory, phase, onAddSet, on
   const [open, setOpen] = useState(roundIdx === 0);
   const isWarmup = roundIdx === 0;
   const filled = round.exercises.filter(ex => (loggedSets[ex.id]||[]).some(s => s.reps)).length;
-
   return (
     <div style={{ background:"#0d0d0d", border:`1px solid ${isWarmup?"#2a2a1a":"#1e1e1e"}`, borderRadius:8, marginBottom:10, overflow:"hidden" }}>
       <div onClick={() => setOpen(!open)}
@@ -503,18 +758,13 @@ function PostSessionChat({ workout, rounds, loggedSets, meta }) {
   const [started, setStarted] = useState(false);
   const bottomRef = useRef(null);
   const systemPrompt = buildSystemPrompt(workout, rounds, loggedSets, meta);
-
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior:"smooth" }); }, [msgs]);
-
   const init = async () => {
     setStarted(true); setLoading(true);
-    const reply = await callClaude([
-      { role:"user", content: systemPrompt + "\n\nBriefly review what I logged and give me your take. Then ask what I want to dig into." }
-    ]);
+    const reply = await callClaude([{ role:"user", content: systemPrompt + "\n\nBriefly review what I logged and give me your take. Then ask what I want to dig into." }]);
     setMsgs([{ role:"assistant", content:reply }]);
     setLoading(false);
   };
-
   const send = async () => {
     if (!input.trim() || loading) return;
     const userMsg = { role:"user", content:input };
@@ -528,14 +778,12 @@ function PostSessionChat({ workout, rounds, loggedSets, meta }) {
     setMsgs([...history, { role:"assistant", content:reply }]);
     setLoading(false);
   };
-
   return (
     <div style={{ marginTop:20 }}>
       <div style={{ color:"#444", fontSize:10, textTransform:"uppercase", letterSpacing:2, marginBottom:10 }}>Post-Session Coach</div>
       {!started ? (
         <button onClick={init}
-          style={{ width:"100%", background:"#101a10", border:"1px solid #2a4a2a", color:"#6aaa6a",
-            borderRadius:8, padding:14, fontSize:14, cursor:"pointer", fontWeight:600 }}>
+          style={{ width:"100%", background:"#101a10", border:"1px solid #2a4a2a", color:"#6aaa6a", borderRadius:8, padding:14, fontSize:14, cursor:"pointer", fontWeight:600 }}>
           🤖 Get Coaching Feedback
         </button>
       ) : (
@@ -566,11 +814,13 @@ function PostSessionChat({ workout, rounds, loggedSets, meta }) {
   );
 }
 
+// ─────────────────────────────────────────────
+// PROGRAM SESSION VIEW (unchanged)
+// ─────────────────────────────────────────────
 function SessionView({ workout, meta, exHistory, onBack, onComplete }) {
   const [loggedSets, setLoggedSets] = useState({});
   const [done, setDone] = useState(false);
   const rounds = buildRounds(workout, meta.sessionCount);
-
   const addSet = (exId) =>
     setLoggedSets(prev => ({ ...prev, [exId]: [...(prev[exId]||[{reps:"",weight:""}]), {reps:"",weight:""}] }));
   const updateSet = (exId, i, field, val) =>
@@ -579,11 +829,8 @@ function SessionView({ workout, meta, exHistory, onBack, onComplete }) {
       sets[i] = { ...sets[i], [field]:val };
       return { ...prev, [exId]:sets };
     });
-
   const totalLogged = Object.values(loggedSets).filter(s => s.some(x => x.reps)).length;
-
   const handleFinish = () => { setDone(true); onComplete(workout.id, loggedSets, rounds); };
-
   return (
     <div>
       <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:16 }}>
@@ -594,17 +841,14 @@ function SessionView({ workout, meta, exHistory, onBack, onComplete }) {
           <div style={{ color:"#d0c090", fontSize:17, fontWeight:700 }}>{workout.focus}</div>
         </div>
       </div>
-
       <div style={{ background:"#111100", border:"1px solid #2a2a14", borderRadius:8, padding:"10px 14px", marginBottom:14 }}>
         <div style={{ color:"#555", fontSize:10, marginBottom:2 }}>WARM-UP</div>
         <div style={{ color:"#6a6a40", fontSize:12 }}>{workout.warmupNote}</div>
       </div>
-
       {rounds.map((r, i) => (
         <RoundCard key={i} round={r} roundIdx={i} loggedSets={loggedSets}
           exHistory={exHistory} phase={meta.phase} onAddSet={addSet} onUpdateSet={updateSet} />
       ))}
-
       {!done ? (
         <button onClick={handleFinish} disabled={totalLogged === 0}
           style={{ width:"100%", marginTop:8, background:totalLogged>0?"#c8b870":"#1a1a1a",
@@ -625,6 +869,247 @@ function SessionView({ workout, meta, exHistory, onBack, onComplete }) {
   );
 }
 
+// ─────────────────────────────────────────────
+// CUSTOM SESSION VIEW (for library-built workouts)
+// ─────────────────────────────────────────────
+function CustomSessionView({ sections, meta, exHistory, onBack, onComplete }) {
+  const [loggedSets, setLoggedSets] = useState({});
+  const [done, setDone] = useState(false);
+  const [openSections, setOpenSections] = useState(() => {
+    const o = {};
+    sections.forEach((s, i) => { o[i] = true; });
+    return o;
+  });
+
+  const addSet = (exId) =>
+    setLoggedSets(prev => ({ ...prev, [exId]: [...(prev[exId]||[{reps:"",weight:""}]), {reps:"",weight:""}] }));
+  const updateSet = (exId, i, field, val) =>
+    setLoggedSets(prev => {
+      const sets = [...(prev[exId]||[{reps:"",weight:""}])];
+      sets[i] = { ...sets[i], [field]:val };
+      return { ...prev, [exId]:sets };
+    });
+
+  const totalLogged = Object.values(loggedSets).filter(s => s.some(x => x.reps)).length;
+  const allExercises = sections.flatMap(s => s.exercises);
+
+  const fakeWorkout = { name:"Custom Build", focus: sections.map(s => s.group).join(" · ") };
+  const fakeRounds = sections.map(s => ({ label: s.group, intensity: s.description || "", exercises: s.exercises }));
+
+  const handleFinish = () => {
+    setDone(true);
+    onComplete("custom", loggedSets, fakeRounds, fakeWorkout.focus);
+  };
+
+  return (
+    <div>
+      <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:16 }}>
+        <button onClick={onBack}
+          style={{ background:"none", border:"1px solid #2a2a2a", color:"#555", borderRadius:6, padding:"5px 10px", cursor:"pointer", fontSize:12 }}>← Back</button>
+        <div>
+          <div style={{ color:"#c87830", fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:1 }}>🏗 Custom Workout</div>
+          <div style={{ color:"#d0c090", fontSize:15, fontWeight:700 }}>{fakeWorkout.focus}</div>
+        </div>
+      </div>
+
+      {sections.map((section, si) => {
+        const isWarmup = section.group === "Warm-Up";
+        const filled = section.exercises.filter(ex => (loggedSets[ex.id]||[]).some(s => s.reps)).length;
+        const open = openSections[si];
+        return (
+          <div key={si} style={{ background:"#0d0d0d", border:`1px solid ${isWarmup?"#2a2a1a":"#1e1e1e"}`, borderRadius:8, marginBottom:10, overflow:"hidden" }}>
+            <div onClick={() => setOpenSections(prev => ({ ...prev, [si]: !prev[si] }))}
+              style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"11px 14px", cursor:"pointer",
+                background: isWarmup ? "#111100" : "#0d0d0d" }}>
+              <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                <span style={{ fontSize:16 }}>{section.icon}</span>
+                <span style={{ color: isWarmup ? "#8a8a60" : "#c8b870", fontWeight:700, fontSize:14 }}>{section.group}</span>
+                {isWarmup && <span style={{ color:"#555", fontSize:10, marginLeft:4 }}>bodyweight prep</span>}
+              </div>
+              <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                {filled > 0 && <span style={{ color:"#5a8a5a", fontSize:11 }}>{filled}/{section.exercises.length} ✓</span>}
+                <span style={{ color:"#333", fontSize:12 }}>{open?"▲":"▼"}</span>
+              </div>
+            </div>
+            {open && (
+              <div style={{ padding:"12px 14px", borderTop:"1px solid #1a1a1a" }}>
+                {section.exercises.map(ex => {
+                  const rec = isWarmup ? null : getRecommendation(ex.id, exHistory[ex.id], meta.phase);
+                  return (
+                    <ExerciseRow key={ex.id} ex={ex}
+                      sets={loggedSets[ex.id] || [{ reps:"", weight:"" }]}
+                      recommendation={rec}
+                      onAddSet={() => addSet(ex.id)}
+                      onUpdateSet={(i, field, val) => updateSet(ex.id, i, field, val)}
+                    />
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      })}
+
+      {!done ? (
+        <button onClick={handleFinish} disabled={totalLogged === 0}
+          style={{ width:"100%", marginTop:8, background:totalLogged>0?"#c8b870":"#1a1a1a",
+            color:totalLogged>0?"#1a1a00":"#333", border:"none", borderRadius:8, padding:14,
+            fontSize:15, fontWeight:700, cursor:totalLogged>0?"pointer":"not-allowed" }}>
+          {totalLogged > 0 ? `Finish Session — ${totalLogged} exercises logged` : "Log at least one exercise"}
+        </button>
+      ) : (
+        <>
+          <div style={{ background:"#0d150d", border:"1px solid #2a4a2a", borderRadius:8, padding:14, marginTop:8 }}>
+            <div style={{ color:"#6aaa6a", fontWeight:700, marginBottom:3 }}>✓ Session saved</div>
+            <div style={{ color:"#555", fontSize:12 }}>Talk to the coach below.</div>
+          </div>
+          <PostSessionChat workout={fakeWorkout} rounds={fakeRounds} loggedSets={loggedSets} meta={meta} />
+        </>
+      )}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────
+// LIBRARY VIEW — browse + pick exercises
+// ─────────────────────────────────────────────
+function LibraryView({ onBack, onStartCustom }) {
+  // selectedExercises: { [groupIndex]: Set of exercise ids }
+  const [selected, setSelected] = useState({});
+  const [expanded, setExpanded] = useState({ 0: true }); // warm-up open by default
+  const [search, setSearch] = useState("");
+
+  const totalSelected = Object.values(selected).reduce((sum, set) => sum + set.size, 0);
+
+  const toggle = (groupIdx, exId) => {
+    setSelected(prev => {
+      const cur = new Set(prev[groupIdx] || []);
+      if (cur.has(exId)) cur.delete(exId); else cur.add(exId);
+      return { ...prev, [groupIdx]: cur };
+    });
+  };
+
+  const toggleGroup = (idx) => setExpanded(prev => ({ ...prev, [idx]: !prev[idx] }));
+
+  const clearAll = () => setSelected({});
+
+  const buildSessions = () => {
+    const sections = [];
+    EXERCISE_LIBRARY.forEach((group, gi) => {
+      const sel = selected[gi];
+      if (!sel || sel.size === 0) return;
+      const exercises = group.exercises.filter(ex => sel.has(ex.id));
+      sections.push({ group: group.group, icon: group.icon, color: group.color, description: group.description, exercises });
+    });
+    // Always put Warm-Up first
+    const warmup = sections.find(s => s.group === "Warm-Up");
+    const rest = sections.filter(s => s.group !== "Warm-Up");
+    onStartCustom(warmup ? [warmup, ...rest] : rest);
+  };
+
+  const matchesSearch = (name) => !search || name.toLowerCase().includes(search.toLowerCase());
+
+  return (
+    <div>
+      <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:16 }}>
+        <button onClick={onBack}
+          style={{ background:"none", border:"1px solid #2a2a2a", color:"#555", borderRadius:6, padding:"5px 10px", cursor:"pointer", fontSize:12 }}>← Back</button>
+        <div style={{ flex:1 }}>
+          <div style={{ color:"#c8b870", fontSize:17, fontWeight:700 }}>Exercise Library</div>
+          <div style={{ color:"#444", fontSize:11 }}>Pick exercises → build your session</div>
+        </div>
+        {totalSelected > 0 && (
+          <button onClick={clearAll}
+            style={{ background:"none", border:"1px solid #2a2a2a", color:"#555", borderRadius:6, padding:"5px 8px", cursor:"pointer", fontSize:11 }}>
+            Clear
+          </button>
+        )}
+      </div>
+
+      {/* Search */}
+      <input
+        value={search} onChange={e => setSearch(e.target.value)}
+        placeholder="Search exercises..."
+        style={{ width:"100%", background:"#141414", border:"1px solid #2a2a2a", borderRadius:8,
+          color:"#c0c0a0", padding:"10px 14px", fontSize:13, marginBottom:14, boxSizing:"border-box" }}
+      />
+
+      {/* Groups */}
+      {EXERCISE_LIBRARY.map((group, gi) => {
+        const groupSelected = selected[gi] || new Set();
+        const isWarmup = group.group === "Warm-Up";
+        const isOpen = expanded[gi];
+        const filtered = group.exercises.filter(ex => matchesSearch(ex.name));
+        if (search && filtered.length === 0) return null;
+        return (
+          <div key={gi} style={{ background:"#0d0d0d", border:`1px solid ${isWarmup?"#2a2a1a":"#1e1e1e"}`, borderRadius:8, marginBottom:8, overflow:"hidden" }}>
+            {/* Group header */}
+            <div style={{ display:"flex", alignItems:"center", padding:"11px 14px", cursor:"pointer",
+              background: isWarmup ? "#111100" : "#0d0d0d" }}
+              onClick={() => toggleGroup(gi)}>
+              <span style={{ fontSize:18, marginRight:8 }}>{group.icon}</span>
+              <div style={{ flex:1 }}>
+                <div style={{ color: groupSelected.size > 0 ? group.color : isWarmup ? "#8a8a60" : "#c8b870", fontWeight:700, fontSize:14 }}>
+                  {group.group}
+                  {groupSelected.size > 0 && <span style={{ color:"#5a8a5a", fontSize:11, marginLeft:8 }}>({groupSelected.size} selected)</span>}
+                </div>
+                <div style={{ color:"#333", fontSize:10 }}>{group.description}</div>
+              </div>
+              <span style={{ color:"#333", fontSize:12 }}>{isOpen?"▲":"▼"}</span>
+            </div>
+
+            {/* Exercises */}
+            {(isOpen || search) && (
+              <div style={{ borderTop:"1px solid #1a1a1a" }}>
+                {filtered.map(ex => {
+                  const isSel = groupSelected.has(ex.id);
+                  return (
+                    <div key={ex.id} onClick={() => toggle(gi, ex.id)}
+                      style={{ display:"flex", alignItems:"center", padding:"9px 14px",
+                        borderBottom:"1px solid #141414", cursor:"pointer",
+                        background: isSel ? "#0d1a0d" : "transparent" }}>
+                      <div style={{ width:20, height:20, borderRadius:4, border:`2px solid ${isSel?"#5a8a5a":"#2a2a2a"}`,
+                        background: isSel ? "#5a8a5a" : "transparent", marginRight:10, flexShrink:0,
+                        display:"flex", alignItems:"center", justifyContent:"center" }}>
+                        {isSel && <span style={{ color:"#fff", fontSize:12, lineHeight:1 }}>✓</span>}
+                      </div>
+                      <div style={{ flex:1 }}>
+                        <div style={{ color: isSel ? "#a0d0a0" : "#c8c8a0", fontSize:13, fontWeight: isSel ? 600 : 400 }}>
+                          {ex.name}
+                          {ex.bw && <span style={{ color:"#4a6a4a", fontSize:10, marginLeft:6 }}>BW</span>}
+                        </div>
+                        <div style={{ color:"#333", fontSize:11, fontStyle:"italic" }}>{ex.note}</div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      })}
+
+      <div style={{ height:80 }} />
+
+      {/* Floating start button */}
+      {totalSelected > 0 && (
+        <div style={{ position:"fixed", bottom:0, left:0, right:0, padding:"12px 16px",
+          background:"linear-gradient(transparent, #080808 40%)", pointerEvents:"none" }}>
+          <button onClick={buildSessions}
+            style={{ width:"100%", maxWidth:480, margin:"0 auto", display:"block",
+              background:"#c8b870", color:"#1a1a00", border:"none", borderRadius:10,
+              padding:"14px 20px", fontSize:15, fontWeight:700, cursor:"pointer", pointerEvents:"all" }}>
+            Start Workout — {totalSelected} exercise{totalSelected !== 1 ? "s" : ""} →
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────
+// HISTORY VIEW
+// ─────────────────────────────────────────────
 function HistoryView({ log, onBack }) {
   const sessions = Object.entries(log).sort((a,b) => new Date(b[0])-new Date(a[0]));
   return (
@@ -647,6 +1132,9 @@ function HistoryView({ log, onBack }) {
   );
 }
 
+// ─────────────────────────────────────────────
+// ALL WORKOUTS VIEW
+// ─────────────────────────────────────────────
 function AllView({ onPick, onBack }) {
   return (
     <div>
@@ -679,8 +1167,9 @@ function AllView({ onPick, onBack }) {
 export default function App() {
   const [view, setView] = useState("home");
   const [activeWorkout, setActiveWorkout] = useState(null);
+  const [customSections, setCustomSections] = useState(null);
   const [log, setLog] = useState({});
-  const [exHistory, setExHistory] = useState({}); // { exId: [{date, sets}] }
+  const [exHistory, setExHistory] = useState({});
   const [meta, setMeta] = useState({ phase:1, sessionCount:0, lastWorkoutId:null });
   const [ready, setReady] = useState(false);
 
@@ -691,7 +1180,6 @@ export default function App() {
     setReady(true);
   }, []);
 
-  // Derive "Up Next" from last workout
   const getUpNext = () => {
     if (!meta.lastWorkoutId) return WORKOUTS.find(w => w.id === SEQUENCE[0]);
     const idx = SEQUENCE.indexOf(meta.lastWorkoutId);
@@ -701,30 +1189,30 @@ export default function App() {
 
   const startWorkout = (w) => { setActiveWorkout(w); setView("session"); };
 
-  const handleComplete = async (workoutId, loggedSets, rounds) => {
-    const workout = WORKOUTS.find(w => w.id === workoutId);
+  const startCustom = (sections) => { setCustomSections(sections); setView("custom-session"); };
+
+  const handleComplete = async (workoutId, loggedSets, rounds, customFocus) => {
+    const workout = workoutId === "custom"
+      ? { name:"Custom Build", focus: customFocus || "Custom" }
+      : WORKOUTS.find(w => w.id === workoutId);
     const key = new Date().toISOString();
     const newCount = meta.sessionCount + 1;
     const newPhase = newCount >= 17 ? 3 : newCount >= 9 ? 2 : 1;
-    const newMeta = { phase:newPhase, sessionCount:newCount, lastWorkoutId:workoutId };
-
-    // Update per-exercise history
+    const newMeta = { phase:newPhase, sessionCount:newCount, lastWorkoutId: workoutId !== "custom" ? workoutId : meta.lastWorkoutId };
     const newExHistory = { ...exHistory };
     rounds.forEach(round => {
       round.exercises.forEach(ex => {
         const sets = (loggedSets[ex.id] || []).filter(s => s.reps);
         if (sets.length) {
           if (!newExHistory[ex.id]) newExHistory[ex.id] = [];
-          newExHistory[ex.id] = [...newExHistory[ex.id], { date:key, sets }].slice(-10); // keep last 10
+          newExHistory[ex.id] = [...newExHistory[ex.id], { date:key, sets }].slice(-10);
         }
       });
     });
-
     const newLog = { ...log, [key]: {
       workoutName: workout.name,
       exerciseCount: Object.values(loggedSets).filter(s => s.some(x => x.reps)).length
     }};
-
     setMeta(newMeta); setLog(newLog); setExHistory(newExHistory);
     await Promise.all([
       storageSave("wt-meta", newMeta),
@@ -755,7 +1243,7 @@ export default function App() {
           <PhaseBar meta={meta} />
           <UpNextCard workout={upNext} onStart={startWorkout} />
 
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:10 }}>
             <div onClick={() => setView("all")}
               style={{ background:"#0d0d0d", border:"1px solid #1e1e1e", borderRadius:8, padding:14, cursor:"pointer" }}>
               <div style={{ fontSize:20, marginBottom:4 }}>📋</div>
@@ -769,14 +1257,33 @@ export default function App() {
               <div style={{ color:"#333", fontSize:11 }}>{Object.keys(log).length} sessions</div>
             </div>
           </div>
+
+          {/* Build Workout card — full width */}
+          <div onClick={() => setView("library")}
+            style={{ background:"linear-gradient(135deg, #0d1a0d, #0d0d0d)", border:"1px solid #2a4a2a",
+              borderRadius:8, padding:"14px 16px", cursor:"pointer", display:"flex", alignItems:"center", gap:14 }}>
+            <span style={{ fontSize:24 }}>🏗</span>
+            <div style={{ flex:1 }}>
+              <div style={{ color:"#6aaa6a", fontWeight:700, fontSize:14 }}>Build Custom Workout</div>
+              <div style={{ color:"#333", fontSize:11 }}>
+                {EXERCISE_LIBRARY.reduce((n, g) => n + g.exercises.length, 0)} exercises · pick by muscle group · warm-up included
+              </div>
+            </div>
+            <span style={{ color:"#2a4a2a", fontSize:18 }}>→</span>
+          </div>
         </>}
 
         {view === "session" && activeWorkout &&
           <SessionView workout={activeWorkout} meta={meta} exHistory={exHistory}
             onBack={() => setView("home")} onComplete={handleComplete} />}
 
+        {view === "custom-session" && customSections &&
+          <CustomSessionView sections={customSections} meta={meta} exHistory={exHistory}
+            onBack={() => setView("library")} onComplete={handleComplete} />}
+
         {view === "history" && <HistoryView log={log} onBack={() => setView("home")} />}
         {view === "all" && <AllView onPick={startWorkout} onBack={() => setView("home")} />}
+        {view === "library" && <LibraryView onBack={() => setView("home")} onStartCustom={startCustom} />}
       </div>
     </div>
   );
