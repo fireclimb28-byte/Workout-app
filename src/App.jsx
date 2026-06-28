@@ -270,29 +270,36 @@ const PHASE = {
 // ─────────────────────────────────────────────
 const EXERCISE_LIBRARY = [
   {
-    group: "Warm-Up",
-    icon: "🔥",
-    color: "#c87830",
-    description: "Bodyweight movement prep — pick 4–6",
+    group: "Rings",
+    icon: "⭕",
+    color: "#5a8a5a",
+    description: "Ring gymnastics — push, pull, lever, and skill work",
     exercises: [
-      { id:"wu-1",  name:"Jumping Jacks",             note:"2 min, light pace — elevate heart rate",        bw:true },
-      { id:"wu-2",  name:"Arm Circles",                note:"10 fwd + 10 back — shoulder mobility",          bw:true },
-      { id:"wu-3",  name:"Leg Swings",                 note:"10 each leg, front-back + side-side",           bw:true },
-      { id:"wu-4",  name:"Hip Circles",                note:"10 each direction — loosen hips",               bw:true },
-      { id:"wu-5",  name:"Cat-Cow",                    note:"10 slow reps — thoracic mobility",              bw:true },
-      { id:"wu-6",  name:"Bear Crawl Walkouts",        note:"5 reps — shoulder + hamstring",                 bw:true },
-      { id:"wu-7",  name:"Mountain Climbers",          note:"20 reps slow — hip flexor activation",          bw:true },
-      { id:"wu-8",  name:"Bodyweight Squat",           note:"10 reps, full depth, slow",                     bw:true },
-      { id:"wu-9",  name:"Dead Hang",                  note:"30s — shoulder decompression",                  bw:true },
-      { id:"wu-10", name:"Inchworm",                   note:"5 reps — hamstring + shoulder flow",            bw:true },
-      { id:"wu-11", name:"Glute Bridge (BW)",          note:"15 reps — activate posterior chain",            bw:true },
-      { id:"wu-12", name:"High Knees",                 note:"30s — heart rate + hip flexors",                bw:true },
-      { id:"wu-13", name:"World's Greatest Stretch",   note:"5 reps each side — full body opener",          bw:true },
-      { id:"wu-14", name:"Wrist Circles",              note:"10 each direction — prep for pressing",         bw:true },
-      { id:"wu-15", name:"Hip Flexor Stretch",         note:"30s each side — kneeling lunge",                bw:true },
-      { id:"wu-16", name:"Hollow Body Hold",           note:"20s — core + posterior chain activation",       bw:true },
-      { id:"wu-17", name:"Shoulder Rolls",             note:"10 fwd + 10 back",                              bw:true },
-      { id:"wu-18", name:"Scapular Push-Ups",          note:"10 reps — serratus activation",                 bw:true },
+      { id:"rg-1",  name:"Ring Push Up",               note:"Body at 45°, control the wobble",                    bw:true },
+      { id:"rg-2",  name:"Ring Dips",                   note:"Full ROM, elbows back — lean forward for chest",     bw:true },
+      { id:"rg-3",  name:"Ring Flys",                   note:"Wide arc, slow eccentric — light load",              bw:true },
+      { id:"rg-4",  name:"Ring Row",                    note:"Feet on ground, body at 45° — adjust for difficulty", bw:true },
+      { id:"rg-5",  name:"Pull Ups (Ring)",              note:"Dead hang, full ROM — rings neutral grip",           bw:true },
+      { id:"rg-6",  name:"L-Sit Pull Ups",               note:"Hold tuck L through the pull",                      bw:true },
+      { id:"rg-7",  name:"Muscle Up",                    note:"Jump assist or band — work the transition",          bw:true },
+      { id:"rg-8",  name:"Back Roll to Support",          note:"Controlled slow rotation into support hold",        bw:true },
+      { id:"rg-9",  name:"Forward Roll to Support",       note:"Forward momentum into support — control descent",   bw:true },
+      { id:"rg-10", name:"Support Hold",                  note:"Static hold at top of dip position, 15–30s",       bw:true },
+      { id:"rg-11", name:"Skin the Cat",                  note:"Full rotation — tuck first, then extend",           bw:true },
+      { id:"rg-12", name:"Skin the Cat to L-Sit",         note:"Rotate through and hold L at bottom",              bw:true },
+      { id:"rg-13", name:"Front Lever (Tuck)",             note:"5–10s holds × 3 — progress toward full lever",    bw:true },
+      { id:"rg-14", name:"Back Lever (Tuck)",              note:"5–10s holds × 3 — arms straight",                 bw:true },
+      { id:"rg-15", name:"Iron Cross",                     note:"Advanced — use bands/assistance, straight arms",   bw:true },
+      { id:"rg-16", name:"Iron Cross Dips",                note:"Dip with arms in cross position — very advanced",  bw:true },
+      { id:"rg-17", name:"Ice Makers",                     note:"Arc from hip to overhead — light and controlled",  bw:true },
+      { id:"rg-18", name:"Planche Push Up (Lean)",          note:"Forward lean, tuck progression — straight arms",  bw:true },
+      { id:"rg-19", name:"Jack Knife Push Up",              note:"Piked position — rings below feet",               bw:true },
+      { id:"rg-20", name:"Tricep Jacknife Push Up",         note:"Rings below knees, hinged body",                  bw:true },
+      { id:"rg-21", name:"Crescent Push Up",                note:"Arc the ring path through the rep",               bw:true },
+      { id:"rg-22", name:"Support L-Sit",                   note:"In & outs on rings — tuck to straddle",           bw:true },
+      { id:"rg-23", name:"Straddle L-Sit",                  note:"Legs wide, hold 10s+ — advanced",                 bw:true },
+      { id:"rg-24", name:"Shoulder Stand",                   note:"Inverted on rings — vertical body control",      bw:true },
+      { id:"rg-25", name:"Row (Balance Ball)",               note:"Feet on ball, mixed grip — core + pull",         bw:true },
     ],
   },
   {
@@ -538,58 +545,6 @@ const EXERCISE_LIBRARY = [
 ];
 
 // ─────────────────────────────────────────────
-// CUSTOM WORKOUT TEMPLATES (mirror the 9 workouts)
-// selections: { [groupIndex]: [exerciseId, ...] }
-// ─────────────────────────────────────────────
-const TEMPLATES = [
-  {
-    id:"t1", name:"Custom Rings", icon:"⭕", color:"#5a8a5a",
-    desc:"Ring push/pull + stabilizer — bodyweight focused",
-    selections:{ 0:["wu-9","wu-2","wu-17"], 1:["ch-6","ch-10","ch-8"], 2:["bk-1","bk-2","bk-11","bk-17"], 3:["sh-11","sh-12"] }
-  },
-  {
-    id:"t2", name:"Custom Skills & Legs", icon:"🎯", color:"#5a7aaa",
-    desc:"Leg strength, balance, and core skill work",
-    selections:{ 0:["wu-4","wu-3","wu-8","wu-11"], 6:["qu-3","qu-7","qu-9","qu-11"], 7:["hm-6","hm-1"], 8:["gl-4","gl-9"], 9:["co-lib-1","co-lib-3"] }
-  },
-  {
-    id:"t3", name:"Custom Chest & Back", icon:"🏋️", color:"#aa5a5a",
-    desc:"Horizontal push/pull supersets",
-    selections:{ 0:["wu-1","wu-2","wu-9"], 1:["ch-1","ch-4","ch-11","ch-13"], 2:["bk-1","bk-6","bk-7","bk-13"] }
-  },
-  {
-    id:"t4", name:"Custom Legs", icon:"🦵", color:"#7a5aaa",
-    desc:"Quad, hamstring, glute, and calf work",
-    selections:{ 0:["wu-4","wu-3","wu-11","wu-8"], 6:["qu-1","qu-2","qu-3","qu-7"], 7:["hm-1","hm-4","hm-6"], 8:["gl-1","gl-5"], 10:["ca-1","ca-2"] }
-  },
-  {
-    id:"t5", name:"Custom Skills / Handstands", icon:"🤸", color:"#5aaa8a",
-    desc:"Skill work, mobility, and bodyweight",
-    selections:{ 0:["wu-5","wu-6","wu-14","wu-16"], 3:["sh-11","sh-12"], 9:["co-lib-4","co-lib-8","co-lib-6"] }
-  },
-  {
-    id:"t6", name:"Custom Shoulders / Arms", icon:"💪", color:"#aa8a5a",
-    desc:"Shoulder press, bicep curls, tricep extensions",
-    selections:{ 0:["wu-2","wu-17","wu-14"], 3:["sh-1","sh-2","sh-4","sh-7","sh-9"], 4:["bi-1","bi-2","bi-3"], 5:["tr-1","tr-3","tr-4"] }
-  },
-  {
-    id:"t7", name:"Custom Core", icon:"🎯", color:"#5a5aaa",
-    desc:"Core stability, rotation, and flexion",
-    selections:{ 0:["wu-5","wu-7","wu-16"], 9:["co-lib-1","co-lib-2","co-lib-3","co-lib-5","co-lib-6","co-lib-9","co-lib-15"] }
-  },
-  {
-    id:"t8", name:"Custom Paddle", icon:"🛶", color:"#5a8aaa",
-    desc:"Lat, rotational, and shoulder stability for paddle sports",
-    selections:{ 0:["wu-2","wu-9","wu-17"], 2:["bk-12","bk-8","bk-7","bk-13"], 3:["sh-9","sh-7"], 9:["co-lib-9","co-lib-16","co-lib-15"] }
-  },
-  {
-    id:"t9", name:"Custom Pilates", icon:"🧘", color:"#aa5a8a",
-    desc:"Glutes, legs, core, and strap movements",
-    selections:{ 0:["wu-4","wu-11","wu-5"], 6:["qu-3","qu-7","qu-13"], 8:["gl-1","gl-4","gl-9","gl-5"], 9:["co-lib-1","co-lib-2","co-lib-13"] }
-  },
-];
-
-// ─────────────────────────────────────────────
 // CARDIO ACTIVITIES
 // ─────────────────────────────────────────────
 const CARDIO_ACTIVITIES = [
@@ -599,6 +554,7 @@ const CARDIO_ACTIVITIES = [
   { id:"crd-kay",  name:"Kayaking",        icon:"🛶" },
   { id:"crd-sup",  name:"SUP",             icon:"🏄" },
   { id:"crd-erg",  name:"ERG",             icon:"🚣" },
+  { id:"crd-other",name:"Other",           icon:"🏃" },
 ];
 
 // ─────────────────────────────────────────────
@@ -635,7 +591,7 @@ function getRecommendation(exId, exHistory, phase) {
   const avgReps = Math.round(lastReps.reduce((a, b) => a + b, 0) / lastReps.length);
   const heaviestW = Math.max(...lastSets.map(s => parseFloat(s.weight) || 0));
   const lastWeight = lastWeights[lastWeights.length - 1];
-  const isBodyweight = !lastWeight || lastWeight === "BW" || lastWeight === "" || isNaN(parseFloat(lastWeight));
+  const isBodyweight = !lastWeight || lastWeight === "BW" || lastWeight === "" || isNaN(parseFloat(lastWeight)) || parseFloat(lastWeight) === 0;
   const targetHigh = PHASE[phase].repsHigh;
   const targetLow = PHASE[phase].repsLow;
   let rec = "", badge = "same";
@@ -781,12 +737,13 @@ function ExerciseRow({ ex, sets, recommendation, onAddSet, onUpdateSet, intent, 
         {sets.map((s, i) => (
           <div key={i} style={{ display:"flex", gap:4, alignItems:"center" }}>
             <span style={{ color:"#333", fontSize:10 }}>S{i+1}</span>
-            <input type="number" placeholder="reps" value={s.reps}
+            <input type="number" placeholder="reps" value={s.reps} min="0"
               onChange={e => onUpdateSet(i,"reps",e.target.value)}
               style={{ width:44, background:"#181818", border:"1px solid #2a2a2a", borderRadius:4, color:"#c8c8a0", padding:"3px 6px", fontSize:13 }} />
-            <input type="text" placeholder="wt/BW" value={s.weight}
+            <input type="number" placeholder="0=BW" value={s.weight} min="0"
               onChange={e => onUpdateSet(i,"weight",e.target.value)}
-              style={{ width:58, background:"#181818", border:"1px solid #2a2a2a", borderRadius:4, color:"#c8c8a0", padding:"3px 6px", fontSize:13 }} />
+              style={{ width:52, background:"#181818", border:"1px solid #2a2a2a", borderRadius:4, color:"#c8c8a0", padding:"3px 6px", fontSize:13 }} />
+            <span style={{ color:"#333", fontSize:10 }}>lbs</span>
           </div>
         ))}
         <button onClick={onAddSet}
@@ -1090,150 +1047,58 @@ function CustomSessionView({ sections, meta, exHistory, onBack, onComplete }) {
 }
 
 // ─────────────────────────────────────────────
-// LIBRARY VIEW — browse + pick exercises
+// EXERCISE PICKER (sub-view for selecting one exercise)
 // ─────────────────────────────────────────────
-function LibraryView({ onBack, onStartCustom }) {
-  // selectedExercises: { [groupIndex]: Set of exercise ids }
-  const [selected, setSelected] = useState({});
-  const [expanded, setExpanded] = useState({ 0: true }); // warm-up open by default
+function ExercisePicker({ onPick, onBack, exHistory, phase }) {
   const [search, setSearch] = useState("");
-  const [activeTemplate, setActiveTemplate] = useState(null);
-
-  const applyTemplate = (tmpl) => {
-    if (activeTemplate === tmpl.id) {
-      // toggle off
-      setActiveTemplate(null);
-      setSelected({});
-    } else {
-      setActiveTemplate(tmpl.id);
-      const newSel = {};
-      Object.entries(tmpl.selections).forEach(([gi, ids]) => {
-        newSel[parseInt(gi)] = new Set(ids);
-      });
-      setSelected(newSel);
-    }
-  };
-
-  const totalSelected = Object.values(selected).reduce((sum, set) => sum + set.size, 0);
-
-  const toggle = (groupIdx, exId) => {
-    setSelected(prev => {
-      const cur = new Set(prev[groupIdx] || []);
-      if (cur.has(exId)) cur.delete(exId); else cur.add(exId);
-      return { ...prev, [groupIdx]: cur };
-    });
-  };
-
-  const toggleGroup = (idx) => setExpanded(prev => ({ ...prev, [idx]: !prev[idx] }));
-
-  const clearAll = () => setSelected({});
-
-  const buildSessions = () => {
-    const sections = [];
-    EXERCISE_LIBRARY.forEach((group, gi) => {
-      const sel = selected[gi];
-      if (!sel || sel.size === 0) return;
-      const exercises = group.exercises.filter(ex => sel.has(ex.id));
-      sections.push({ group: group.group, icon: group.icon, color: group.color, description: group.description, exercises });
-    });
-    // Always put Warm-Up first
-    const warmup = sections.find(s => s.group === "Warm-Up");
-    const rest = sections.filter(s => s.group !== "Warm-Up");
-    onStartCustom(warmup ? [warmup, ...rest] : rest);
-  };
-
-  const matchesSearch = (name) => !search || name.toLowerCase().includes(search.toLowerCase());
-
+  const [expanded, setExpanded] = useState({});
+  const matches = (name) => !search || name.toLowerCase().includes(search.toLowerCase());
   return (
     <div>
-      <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:16 }}>
+      <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:14 }}>
         <button onClick={onBack}
           style={{ background:"none", border:"1px solid #2a2a2a", color:"#555", borderRadius:6, padding:"5px 10px", cursor:"pointer", fontSize:12 }}>← Back</button>
-        <div style={{ flex:1 }}>
-          <div style={{ color:"#c8b870", fontSize:17, fontWeight:700 }}>Exercise Library</div>
-          <div style={{ color:"#444", fontSize:11 }}>Pick exercises → build your session</div>
-        </div>
-        {totalSelected > 0 && (
-          <button onClick={clearAll}
-            style={{ background:"none", border:"1px solid #2a2a2a", color:"#555", borderRadius:6, padding:"5px 8px", cursor:"pointer", fontSize:11 }}>
-            Clear
-          </button>
-        )}
+        <div style={{ color:"#c8b870", fontSize:15, fontWeight:700 }}>Pick Exercise</div>
       </div>
-
-      {/* Templates */}
-      <div style={{ marginBottom:14 }}>
-        <div style={{ color:"#444", fontSize:10, textTransform:"uppercase", letterSpacing:2, marginBottom:8 }}>Start from a template</div>
-        <div style={{ display:"flex", gap:8, overflowX:"auto", paddingBottom:6, WebkitOverflowScrolling:"touch" }}>
-          {TEMPLATES.map(tmpl => {
-            const isActive = activeTemplate === tmpl.id;
-            return (
-              <div key={tmpl.id} onClick={() => applyTemplate(tmpl)}
-                style={{ flexShrink:0, background: isActive ? `${tmpl.color}22` : "#0d0d0d",
-                  border:`1px solid ${isActive ? tmpl.color : "#2a2a2a"}`,
-                  borderRadius:8, padding:"10px 12px", cursor:"pointer", minWidth:130, maxWidth:150 }}>
-                <div style={{ fontSize:18, marginBottom:4 }}>{tmpl.icon}</div>
-                <div style={{ color: isActive ? tmpl.color : "#888", fontSize:12, fontWeight:700, lineHeight:1.2 }}>{tmpl.name}</div>
-                <div style={{ color:"#333", fontSize:10, marginTop:3 }}>{tmpl.desc}</div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Search */}
-      <input
-        value={search} onChange={e => setSearch(e.target.value)}
+      <input value={search} onChange={e => setSearch(e.target.value)}
         placeholder="Search exercises..."
         style={{ width:"100%", background:"#141414", border:"1px solid #2a2a2a", borderRadius:8,
-          color:"#c0c0a0", padding:"10px 14px", fontSize:13, marginBottom:14, boxSizing:"border-box" }}
-      />
-
-      {/* Groups */}
+          color:"#c0c0a0", padding:"10px 14px", fontSize:13, marginBottom:12, boxSizing:"border-box" }} />
       {EXERCISE_LIBRARY.map((group, gi) => {
-        const groupSelected = selected[gi] || new Set();
-        const isWarmup = group.group === "Warm-Up";
-        const isOpen = expanded[gi];
-        const filtered = group.exercises.filter(ex => matchesSearch(ex.name));
+        const filtered = group.exercises.filter(ex => matches(ex.name));
         if (search && filtered.length === 0) return null;
+        const isOpen = expanded[gi];
         return (
-          <div key={gi} style={{ background:"#0d0d0d", border:`1px solid ${isWarmup?"#2a2a1a":"#1e1e1e"}`, borderRadius:8, marginBottom:8, overflow:"hidden" }}>
-            {/* Group header */}
-            <div style={{ display:"flex", alignItems:"center", padding:"11px 14px", cursor:"pointer",
-              background: isWarmup ? "#111100" : "#0d0d0d" }}
-              onClick={() => toggleGroup(gi)}>
-              <span style={{ fontSize:18, marginRight:8 }}>{group.icon}</span>
+          <div key={gi} style={{ background:"#0d0d0d", border:"1px solid #1e1e1e", borderRadius:8, marginBottom:8, overflow:"hidden" }}>
+            <div onClick={() => setExpanded(prev => ({ ...prev, [gi]: !prev[gi] }))}
+              style={{ display:"flex", alignItems:"center", padding:"11px 14px", cursor:"pointer" }}>
+              <span style={{ fontSize:16, marginRight:8 }}>{group.icon}</span>
               <div style={{ flex:1 }}>
-                <div style={{ color: groupSelected.size > 0 ? group.color : isWarmup ? "#8a8a60" : "#c8b870", fontWeight:700, fontSize:14 }}>
-                  {group.group}
-                  {groupSelected.size > 0 && <span style={{ color:"#5a8a5a", fontSize:11, marginLeft:8 }}>({groupSelected.size} selected)</span>}
-                </div>
+                <div style={{ color:"#c8b870", fontWeight:700, fontSize:13 }}>{group.group}</div>
                 <div style={{ color:"#333", fontSize:10 }}>{group.description}</div>
               </div>
-              <span style={{ color:"#333", fontSize:12 }}>{isOpen?"▲":"▼"}</span>
+              <span style={{ color:"#333", fontSize:12 }}>{isOpen ? "▲" : "▼"}</span>
             </div>
-
-            {/* Exercises */}
             {(isOpen || search) && (
               <div style={{ borderTop:"1px solid #1a1a1a" }}>
                 {filtered.map(ex => {
-                  const isSel = groupSelected.has(ex.id);
+                  const hist = exHistory[ex.id];
+                  const rec = hist ? getRecommendation(ex.id, hist, phase) : null;
                   return (
-                    <div key={ex.id} onClick={() => toggle(gi, ex.id)}
-                      style={{ display:"flex", alignItems:"center", padding:"9px 14px",
-                        borderBottom:"1px solid #141414", cursor:"pointer",
-                        background: isSel ? "#0d1a0d" : "transparent" }}>
-                      <div style={{ width:20, height:20, borderRadius:4, border:`2px solid ${isSel?"#5a8a5a":"#2a2a2a"}`,
-                        background: isSel ? "#5a8a5a" : "transparent", marginRight:10, flexShrink:0,
-                        display:"flex", alignItems:"center", justifyContent:"center" }}>
-                        {isSel && <span style={{ color:"#fff", fontSize:12, lineHeight:1 }}>✓</span>}
-                      </div>
-                      <div style={{ flex:1 }}>
-                        <div style={{ color: isSel ? "#a0d0a0" : "#c8c8a0", fontSize:13, fontWeight: isSel ? 600 : 400 }}>
-                          {ex.name}
-                          {ex.bw && <span style={{ color:"#4a6a4a", fontSize:10, marginLeft:6 }}>BW</span>}
+                    <div key={ex.id} onClick={() => onPick(ex)}
+                      style={{ padding:"10px 14px", borderBottom:"1px solid #141414", cursor:"pointer" }}>
+                      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
+                        <div style={{ flex:1 }}>
+                          <span style={{ color:"#c8c8a0", fontSize:13 }}>{ex.name}</span>
+                          {ex.bw && <span style={{ color:"#4a5a4a", fontSize:10, marginLeft:6 }}>BW</span>}
+                          <div style={{ color:"#333", fontSize:11, fontStyle:"italic", marginTop:1 }}>{ex.note}</div>
                         </div>
-                        <div style={{ color:"#333", fontSize:11, fontStyle:"italic" }}>{ex.note}</div>
+                        {rec && (
+                          <div style={{ textAlign:"right", marginLeft:10 }}>
+                            <div style={{ color:"#4a6a4a", fontSize:10 }}>{rec.lastDate}</div>
+                            <div style={{ color:"#5a8a5a", fontSize:11, fontWeight:600 }}>{rec.rec.slice(0, 30)}{rec.rec.length > 30 ? "…" : ""}</div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   );
@@ -1243,18 +1108,134 @@ function LibraryView({ onBack, onStartCustom }) {
           </div>
         );
       })}
+      <div style={{ height:40 }} />
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────
+// LIBRARY VIEW — pair-based custom workout builder
+// ─────────────────────────────────────────────
+function LibraryView({ onBack, onStartCustom, exHistory, meta }) {
+  const [pairs, setPairs] = useState([{ a: null, b: null, skipA: false, skipB: false }]);
+  const [picking, setPicking] = useState(null); // { pairIdx, slot: 'a'|'b' }
+
+  const canStart = pairs.some(p => (p.a && !p.skipA) || (p.b && !p.skipB));
+
+  const startSession = () => {
+    const rounds = [1,2,3,4].map(r => ({
+      group: `Round ${r}`,
+      icon: "🔁",
+      color: "#c8b870",
+      description: `Set ${r} of 4`,
+      exercises: pairs.flatMap(p => [
+        ...(p.a && !p.skipA ? [p.a] : []),
+        ...(p.b && !p.skipB ? [p.b] : []),
+      ]),
+    })).filter(r => r.exercises.length > 0);
+    onStartCustom(rounds);
+  };
+
+  if (picking !== null) {
+    return (
+      <ExercisePicker
+        exHistory={exHistory} phase={meta.phase}
+        onBack={() => setPicking(null)}
+        onPick={(ex) => {
+          setPairs(prev => prev.map((p, i) =>
+            i === picking.pairIdx ? { ...p, [picking.slot]: ex } : p
+          ));
+          setPicking(null);
+        }}
+      />
+    );
+  }
+
+  return (
+    <div>
+      <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:16 }}>
+        <button onClick={onBack}
+          style={{ background:"none", border:"1px solid #2a2a2a", color:"#555", borderRadius:6, padding:"5px 10px", cursor:"pointer", fontSize:12 }}>← Back</button>
+        <div style={{ flex:1 }}>
+          <div style={{ color:"#c8b870", fontSize:17, fontWeight:700 }}>Custom Workout</div>
+          <div style={{ color:"#444", fontSize:11 }}>Build pairs → 4 rounds each</div>
+        </div>
+      </div>
+
+      {pairs.map((pair, pi) => {
+        const recA = pair.a ? getRecommendation(pair.a.id, exHistory[pair.a.id], meta.phase) : null;
+        const recB = pair.b ? getRecommendation(pair.b.id, exHistory[pair.b.id], meta.phase) : null;
+        return (
+          <div key={pi} style={{ background:"#0d0d0d", border:"1px solid #1e1e1e", borderRadius:8, padding:14, marginBottom:10 }}>
+            {/* Pair header */}
+            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:12 }}>
+              <span style={{ color:"#c8b870", fontWeight:700, fontSize:13 }}>Pair {pi + 1}</span>
+              {pairs.length > 1 && (
+                <button onClick={() => setPairs(prev => prev.filter((_, i) => i !== pi))}
+                  style={{ background:"none", border:"none", color:"#444", cursor:"pointer", fontSize:12 }}>✕ Remove</button>
+              )}
+            </div>
+
+            {/* Slot A */}
+            {[{ slot:"a", ex: pair.a, skip: pair.skipA, skipKey:"skipA", label:"A" },
+              { slot:"b", ex: pair.b, skip: pair.skipB, skipKey:"skipB", label:"B" }
+            ].map(({ slot, ex, skip, skipKey, label }, si) => {
+              const rec = slot === "a" ? recA : recB;
+              return (
+                <div key={slot}>
+                  {si === 1 && (
+                    <div style={{ textAlign:"center", color:"#2a2a2a", fontSize:10, letterSpacing:2, margin:"10px 0" }}>⟷ opposing muscle</div>
+                  )}
+                  <div style={{ display:"flex", gap:8, alignItems:"stretch", opacity: skip ? 0.4 : 1 }}>
+                    <div style={{ color:"#555", fontSize:11, fontWeight:700, minWidth:16, paddingTop:10 }}>{label}</div>
+                    <div onClick={() => !skip && setPicking({ pairIdx: pi, slot })}
+                      style={{ flex:1, background:"#141414", border:"1px solid #2a2a2a", borderRadius:6,
+                        padding:"9px 12px", cursor: skip ? "default" : "pointer", minHeight:42 }}>
+                      {ex ? (
+                        <>
+                          <div style={{ color:"#c8c8a0", fontSize:13, fontWeight:600 }}>{ex.name}</div>
+                          {rec && <div style={{ color:"#5a7a5a", fontSize:11, marginTop:2 }}>{rec.rec}</div>}
+                          {!rec && <div style={{ color:"#333", fontSize:11 }}>No history yet</div>}
+                        </>
+                      ) : (
+                        <div style={{ color:"#333", fontSize:13 }}>Tap to pick exercise →</div>
+                      )}
+                    </div>
+                    {ex && (
+                      <button onClick={() => setPairs(prev => prev.map((p, i) =>
+                        i === pi ? { ...p, [skipKey]: !p[skipKey] } : p
+                      ))}
+                        style={{ background: skip ? "#1a3a1a" : "#181818",
+                          border:`1px solid ${skip ? "#3a6a3a" : "#2a2a2a"}`,
+                          color: skip ? "#6aaa6a" : "#555",
+                          borderRadius:6, padding:"6px 10px", cursor:"pointer", fontSize:11, whiteSpace:"nowrap" }}>
+                        {skip ? "skipped" : "skip"}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        );
+      })}
+
+      <button onClick={() => setPairs(prev => [...prev, { a: null, b: null, skipA: false, skipB: false }])}
+        style={{ width:"100%", background:"#141414", border:"1px dashed #2a2a2a", color:"#555",
+          borderRadius:8, padding:12, cursor:"pointer", fontSize:13, marginBottom:10 }}>
+        + Add Another Pair
+      </button>
 
       <div style={{ height:80 }} />
 
-      {/* Floating start button */}
-      {totalSelected > 0 && (
+      {canStart && (
         <div style={{ position:"fixed", bottom:0, left:0, right:0, padding:"12px 16px",
           background:"linear-gradient(transparent, #080808 40%)", pointerEvents:"none" }}>
-          <button onClick={buildSessions}
+          <button onClick={startSession}
             style={{ width:"100%", maxWidth:480, margin:"0 auto", display:"block",
               background:"#c8b870", color:"#1a1a00", border:"none", borderRadius:10,
               padding:"14px 20px", fontSize:15, fontWeight:700, cursor:"pointer", pointerEvents:"all" }}>
-            Start Workout — {totalSelected} exercise{totalSelected !== 1 ? "s" : ""} →
+            Start 4-Round Session →
           </button>
         </div>
       )}
@@ -1321,7 +1302,7 @@ function AllView({ onPick, onBack }) {
 // ─────────────────────────────────────────────
 function CardioView({ exHistory, onBack, onComplete }) {
   const [activity, setActivity] = useState(null);
-  const [fields, setFields] = useState({ time:"", distance:"", heartRate:"", intensity:5 });
+  const [fields, setFields] = useState({ time:"", distance:"", heartRate:"", intensity:"" });
   const [intent, setIntentState] = useState(null);
   const [notes, setNotes] = useState("");
   const [done, setDone] = useState(false);
@@ -1425,7 +1406,7 @@ Give specific feedback on this session. 3–5 sentences.`;
         <div style={{ background:"#111a11", border:"1px solid #2a4a2a33", borderRadius:6, padding:"8px 12px", marginBottom:12 }}>
           <div style={{ color:"#4a6a4a", fontSize:10, marginBottom:3 }}>Last: {new Date(lastCardio.date).toLocaleDateString("en-US",{month:"short",day:"numeric"})}</div>
           <div style={{ color:"#888", fontSize:12 }}>
-            {[lastCardio.fields?.time, lastCardio.fields?.distance && `${lastCardio.fields.distance}`, lastCardio.fields?.heartRate && `HR ${lastCardio.fields.heartRate}`, `Intensity ${lastCardio.fields?.intensity}/10`].filter(Boolean).join(" · ")}
+            {[lastCardio.fields?.time && `${lastCardio.fields.time} min`, lastCardio.fields?.distance && `${lastCardio.fields.distance} mi`, lastCardio.fields?.heartRate && `${lastCardio.fields.heartRate} bpm`, lastCardio.fields?.intensity && `Intensity ${lastCardio.fields.intensity}/10`].filter(Boolean).join(" · ")}
           </div>
           {lastCardio.nextIntent && (
             <div style={{ color: lastCardio.nextIntent==="+" ? "#5aaa5a" : lastCardio.nextIntent==="-" ? "#aa5a5a" : "#5a5aaa", fontSize:10, marginTop:3 }}>
@@ -1439,24 +1420,28 @@ Give specific feedback on this session. 3–5 sentences.`;
       <div style={{ background:"#0d0d0d", border:"1px solid #1e1e1e", borderRadius:8, padding:14, marginBottom:10 }}>
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:12 }}>
           <div>
-            <div style={{ color:"#555", fontSize:10, marginBottom:4 }}>TIME</div>
-            <input placeholder="e.g. 1h 30m" value={fields.time} onChange={e => update("time",e.target.value)}
+            <div style={{ color:"#555", fontSize:10, marginBottom:4 }}>TIME (min)</div>
+            <input type="number" placeholder="90" min="0" value={fields.time} onChange={e => update("time",e.target.value)}
               style={{ width:"100%", boxSizing:"border-box", background:"#181818", border:"1px solid #2a2a2a", borderRadius:4, color:"#c8c8a0", padding:"6px 8px", fontSize:13 }} />
           </div>
           <div>
-            <div style={{ color:"#555", fontSize:10, marginBottom:4 }}>DISTANCE</div>
-            <input placeholder="e.g. 12 mi" value={fields.distance} onChange={e => update("distance",e.target.value)}
+            <div style={{ color:"#555", fontSize:10, marginBottom:4 }}>DISTANCE (mi)</div>
+            <input type="number" placeholder="12" min="0" step="0.1" value={fields.distance} onChange={e => update("distance",e.target.value)}
               style={{ width:"100%", boxSizing:"border-box", background:"#181818", border:"1px solid #2a2a2a", borderRadius:4, color:"#c8c8a0", padding:"6px 8px", fontSize:13 }} />
           </div>
           <div>
-            <div style={{ color:"#555", fontSize:10, marginBottom:4 }}>AVG HEART RATE</div>
-            <input placeholder="e.g. 145 bpm" value={fields.heartRate} onChange={e => update("heartRate",e.target.value)}
+            <div style={{ color:"#555", fontSize:10, marginBottom:4 }}>AVG HEART RATE (bpm)</div>
+            <input type="number" placeholder="145" min="0" max="250" value={fields.heartRate} onChange={e => update("heartRate",e.target.value)}
               style={{ width:"100%", boxSizing:"border-box", background:"#181818", border:"1px solid #2a2a2a", borderRadius:4, color:"#c8c8a0", padding:"6px 8px", fontSize:13 }} />
           </div>
           <div>
-            <div style={{ color:"#555", fontSize:10, marginBottom:6 }}>INTENSITY — {fields.intensity}/10</div>
-            <input type="range" min={1} max={10} value={fields.intensity} onChange={e => update("intensity",e.target.value)}
-              style={{ width:"100%", accentColor:"#c8b870" }} />
+            <div style={{ color:"#555", fontSize:10, marginBottom:4 }}>INTENSITY (1–10)</div>
+            <input type="number" placeholder="7" min="1" max="10" value={fields.intensity}
+              onChange={e => {
+                const v = e.target.value;
+                if (v === "" || (parseInt(v) >= 1 && parseInt(v) <= 10)) update("intensity", v);
+              }}
+              style={{ width:"100%", boxSizing:"border-box", background:"#181818", border:"1px solid #2a2a2a", borderRadius:4, color:"#c8c8a0", padding:"6px 8px", fontSize:13 }} />
           </div>
         </div>
 
@@ -1663,7 +1648,7 @@ export default function App() {
             <div style={{ flex:1 }}>
               <div style={{ color:"#6aaa6a", fontWeight:700, fontSize:14 }}>Build Custom Workout</div>
               <div style={{ color:"#333", fontSize:11 }}>
-                {EXERCISE_LIBRARY.reduce((n, g) => n + g.exercises.length, 0)} exercises · {TEMPLATES.length} templates · warm-up included
+                {EXERCISE_LIBRARY.reduce((n, g) => n + g.exercises.length, 0)} exercises · pick pairs · 4 rounds · history-guided
               </div>
             </div>
             <span style={{ color:"#2a4a2a", fontSize:18 }}>→</span>
@@ -1692,7 +1677,7 @@ export default function App() {
 
         {view === "history" && <HistoryView log={log} onBack={() => setView("home")} />}
         {view === "all" && <AllView onPick={startWorkout} onBack={() => setView("home")} />}
-        {view === "library" && <LibraryView onBack={() => setView("home")} onStartCustom={startCustom} />}
+        {view === "library" && <LibraryView onBack={() => setView("home")} onStartCustom={startCustom} exHistory={exHistory} meta={meta} />}
         {view === "cardio" && <CardioView exHistory={exHistory} onBack={() => setView("home")} onComplete={handleComplete} />}
       </div>
     </div>
